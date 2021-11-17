@@ -13,5 +13,37 @@
       "url": "http://telemetryUrl/metrics",
       "interval": "3"
     }
-  }
+  },
+  "job_manager": {
+    "url": "http://localhost:8080"
+  },
+  "mapproxy_api": {
+    "url": "http://localhost:8081"
+  },
+  "tiles_storage_provider": "S3",
+  "fs": {
+    "tiles_location": "./tiles",
+    "sources_location": "/tiffs"
+  },
+  "s3": {
+    "apiVersion": "2006-03-01",
+    "endpoint": "http://localhost:9000",
+    "accessKeyId": "minioadmin",
+    "secretAccessKey": "minioadmin",
+    "sslEnabled": false,
+    "maxRetries": 3,
+    "bucket": "raster"
+  },
+  "batch_size": {
+    "discreteLayers": 10,
+    "tiffDirectoryDeletion": 1,
+    "tilesDeletion": 1
+  },
+  "failed_cleanup_delay_days": 14,
+  "httpRetry": {
+    "attempts": 3,
+    "delay": "exponential",
+    "shouldResetTimeout": true
+  },
+  "ingestion_job_type": "Discrete-Tiling"
 }

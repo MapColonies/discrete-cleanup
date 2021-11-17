@@ -13,5 +13,7 @@ export const SERVICES: Record<string, symbol> = {
   TRACER: Symbol('Tracer'),
   METER: Symbol('Meter'),
   METRICS: Symbol('Metrics'),
+  TILE_PROVIDER: Symbol('TileProvider'),
+  SOURCES_PROVIDER: Symbol('SourcesProvider'),
 };
 /* eslint-enable @typescript-eslint/naming-convention */
