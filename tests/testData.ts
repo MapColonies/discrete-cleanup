@@ -1,5 +1,5 @@
-import { IngestionParams } from "@map-colonies/mc-model-types";
-import { IJob } from "../src/common/interfaces";
+import { IngestionParams } from '@map-colonies/mc-model-types';
+import { IJob } from '../src/common/interfaces';
 
 const discreteArray = [
   {
@@ -11,28 +11,28 @@ const discreteArray = [
         id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         parameters: {
           minZoom: 0,
-          maxZoom: 8
+          maxZoom: 8,
         },
         updateDate: '2021-03-15T08:06:29.117Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
       originDirectory: 'fakeDir1/fakeDir2',
-      metadata:{
+      metadata: {
         productId: 'demo_1',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: '8ca6057a-e464-4682-8f11-a9754a88171e',
@@ -43,28 +43,28 @@ const discreteArray = [
         id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         parameters: {
           minZoom: 0,
-          maxZoom: 8
+          maxZoom: 8,
         },
         updateDate: '2021-03-15T08:06:29.117Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile4.png', 'tile5.png', 'tile6.png'],
       originDirectory: 'fakeDir3/fakeDir4',
-      metadata:{
+      metadata: {
         productId: 'demo_2',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: 'e429f88c-3c8c-49f7-9afe-aac6fc786467',
@@ -75,28 +75,28 @@ const discreteArray = [
         id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         parameters: {
           minZoom: 0,
-          maxZoom: 8
+          maxZoom: 8,
         },
         updateDate: '2021-03-15T08:06:29.117Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile7.png', 'tile8.png', 'tile9.png'],
       originDirectory: 'fakeDir5/fakeDir6',
-      metadata:{
+      metadata: {
         productId: 'demo_3',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: 'edf1d872-2b8a-4556-a3d6-4bb3f198c00e',
@@ -107,29 +107,29 @@ const discreteArray = [
         id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         parameters: {
           minZoom: 0,
-          maxZoom: 8
+          maxZoom: 8,
         },
         created: '2021-04-25T13:10:06.614Z',
         updated: '2021-04-25T13:10:06.614Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile10.png', 'tile11.png', 'tile12.png'],
       originDirectory: 'fakeDir7/fakeDir8',
-      metadata:{
+      metadata: {
         productId: 'demo_4',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: 'bab81024-eb0b-4362-a682-25d411f40d34',
@@ -140,29 +140,29 @@ const discreteArray = [
         id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         parameters: {
           minZoom: 0,
-          maxZoom: 8
+          maxZoom: 8,
         },
         created: '2021-04-25T13:10:06.614Z',
         updated: '2021-04-25T13:10:06.614Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile13.png', 'tile14.png', 'tile15.png'],
       originDirectory: 'fakeDir9/fakeDir10',
-      metadata:{
+      metadata: {
         productId: 'demo_5',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: 'demo_6',
@@ -175,24 +175,24 @@ const discreteArray = [
         updateDate: '2021-03-15T08:06:29.117Z',
         status: 'Pending',
         reason: '',
-        attempts: 0
-      }
+        attempts: 0,
+      },
     ],
     parameters: {
       fileNames: ['tile16.png', 'tile17.png', 'tile18.png'],
       originDirectory: 'fakeDir11/fakeDir12',
-      metadata:{
+      metadata: {
         productId: 'demo_6',
         productVersion: 'tiles',
-        productType: 'OrthophotoHistory'
-      }
+        productType: 'OrthophotoHistory',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Completed',
     reason: '',
-    isCleaned: true
-  }
+    isCleaned: true,
+  },
 ] as unknown as IJob<IngestionParams>[];
 
 const urisArray = [
@@ -201,7 +201,7 @@ const urisArray = [
   '/tiffs/fakeDir5/fakeDir6',
   '/tiffs/fakeDir7/fakeDir8',
   '/tiffs/fakeDir9/fakeDir10',
-  '/tiffs/fakeDir11/fakeDir12'
+  '/tiffs/fakeDir11/fakeDir12',
 ];
 
 const s3KeysArray = urisArray.map((uri) => {

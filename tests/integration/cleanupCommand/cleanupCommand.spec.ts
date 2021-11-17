@@ -7,9 +7,14 @@ import { JobManagerClient } from '../../../src/clients/jobManagerClient';
 import { MapproxyClient } from '../../../src/clients/mapproxyClient';
 import { SERVICES } from '../../../src/common/constants';
 import { createStorageProviderMock, IStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
-import { jobManagerClientMock, getFailedAndNotCleanedJobsMock, getSuccessNotCleanedJobsMock, markAsCompletedMock } from '../../mocks/clients/jobManagerClient';
+import {
+  jobManagerClientMock,
+  getFailedAndNotCleanedJobsMock,
+  getSuccessNotCleanedJobsMock,
+  markAsCompletedMock,
+} from '../../mocks/clients/jobManagerClient';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
-import { initConfig,configMock, setConfigValue } from '../../mocks/config';
+import { initConfig, configMock, setConfigValue } from '../../mocks/config';
 import { discreteArray } from '../../testData';
 import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
@@ -21,7 +26,7 @@ describe('CleanupCommand', function () {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   let sourcesProvider: IStorageProviderMock;
 
-  beforeAll(()=>{
+  beforeAll(() => {
     jest.useFakeTimers();
   });
 
@@ -34,8 +39,8 @@ describe('CleanupCommand', function () {
     tileProvider = createStorageProviderMock();
     sourcesProvider = createStorageProviderMock();
 
-    container.registerInstance(JobManagerClient,jobManagerClientMock);
-    container.registerInstance(MapproxyClient,mapproxyClientMock);
+    container.registerInstance(JobManagerClient, jobManagerClientMock);
+    container.registerInstance(MapproxyClient, mapproxyClientMock);
 
     const app = getApp({
       override: [
@@ -58,16 +63,16 @@ describe('CleanupCommand', function () {
     jest.restoreAllMocks();
   });
 
-  afterAll(()=>{
+  afterAll(() => {
     jest.useRealTimers();
   });
 
   describe('Happy Path', function () {
     it('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
-      setConfigValue('batch_size.discreteLayers',100);
-      setConfigValue('failed_cleanup_delay_days',14);
-      const failedAndNotCleaned = discreteArray.slice(0,3);
+      setConfigValue('batch_size.discreteLayers', 100);
+      setConfigValue('failed_cleanup_delay_days', 14);
+      const failedAndNotCleaned = discreteArray.slice(0, 3);
       const successAndNotCleaned = discreteArray.slice(3);
       getFailedAndNotCleanedJobsMock.mockResolvedValue(failedAndNotCleaned);
       getSuccessNotCleanedJobsMock.mockResolvedValue(successAndNotCleaned);
@@ -76,12 +81,10 @@ describe('CleanupCommand', function () {
 
       await cli.cleanup();
 
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1)
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
       expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledWith(failedAndNotCleaned);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledWith(successAndNotCleaned);
-
     });
   });
-  
 });

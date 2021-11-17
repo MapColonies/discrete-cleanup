@@ -1,4 +1,4 @@
-import { configMock,initConfig, setConfigValue } from '../../mocks/config';
+import { configMock, initConfig, setConfigValue } from '../../mocks/config';
 import { createStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { jobManagerClientMock, getFailedAndNotCleanedJobsMock, markAsCompletedMock } from '../../mocks/clients/jobManagerClient';
@@ -12,13 +12,13 @@ const filedJobs = [
     tasks: [],
     parameters: {
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
-      originDirectory: 'fakeDir1/fakeDir2'
+      originDirectory: 'fakeDir1/fakeDir2',
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'Failed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: '8ca6057a-e464-4682-8f11-a9754a88171e',
@@ -27,13 +27,13 @@ const filedJobs = [
     tasks: [],
     parameters: {
       fileNames: ['tile4.png', 'tile5.png', 'tile6.png'],
-      originDirectory: 'fakeDir3/fakeDir4'
+      originDirectory: 'fakeDir3/fakeDir4',
     },
     created: '2021-04-11T13:11:06.614Z',
     updated: '2021-04-11T13:11:06.614Z',
     status: 'Failed',
     reason: '',
-    isCleaned: true
+    isCleaned: true,
   },
   {
     id: 'e429f88c-3c8c-49f7-9afe-aac6fc786467',
@@ -42,32 +42,36 @@ const filedJobs = [
     tasks: [],
     parameters: {
       fileNames: ['tile7.png', 'tile8.png', 'tile9.png'],
-      originDirectory: 'fakeDir5/fakeDir6'
+      originDirectory: 'fakeDir5/fakeDir6',
     },
     created: '2021-04-11T12:10:06.614Z',
     updated: '2021-04-11T12:10:06.614Z',
     status: 'Failed',
     reason: '',
-    isCleaned: true
-  }
+    isCleaned: true,
+  },
 ];
 
-
 describe('CleanupManager', () => {
-  
   const tileProviderMock = createStorageProviderMock();
   const sourcesProviderMock = createStorageProviderMock();
 
   let manager: CleanupManager;
 
-  beforeAll(()=>{
+  beforeAll(() => {
     jest.useFakeTimers().setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
-  })
+  });
 
   beforeEach(() => {
     initConfig();
-    setConfigValue('batch_size.discreteLayers',100);
-    manager = new CleanupManager(tileProviderMock.providerMock, sourcesProviderMock.providerMock, configMock, mapproxyClientMock, jobManagerClientMock);
+    setConfigValue('batch_size.discreteLayers', 100);
+    manager = new CleanupManager(
+      tileProviderMock.providerMock,
+      sourcesProviderMock.providerMock,
+      configMock,
+      mapproxyClientMock,
+      jobManagerClientMock
+    );
   });
 
   afterEach(() => {
@@ -75,9 +79,9 @@ describe('CleanupManager', () => {
     jest.restoreAllMocks();
   });
 
-  afterAll(()=>{
+  afterAll(() => {
     jest.useRealTimers();
-  })
+  });
 
   describe('cleanFailedTasks', () => {
     it('failed job sources will be deleted only for expired failed jobs', async () => {

@@ -1,16 +1,16 @@
-import { IStorageProvider } from "../../../src/storageProviders/iStorageProvider";
+import { IStorageProvider } from '../../../src/storageProviders/iStorageProvider';
 
 export interface IStorageProviderMock {
-  providerMock: IStorageProvider,
-  deleteDiscretesMock: jest.Mock
+  providerMock: IStorageProvider;
+  deleteDiscretesMock: jest.Mock;
 }
 
-export function createStorageProviderMock():IStorageProviderMock {
+export function createStorageProviderMock(): IStorageProviderMock {
   const deleteDiscretesMock = jest.fn();
   return {
     providerMock: {
-      deleteDiscretes: deleteDiscretesMock
+      deleteDiscretes: deleteDiscretesMock,
     } as unknown as IStorageProvider,
-    deleteDiscretesMock
-  }
+    deleteDiscretesMock,
+  };
 }

@@ -9,10 +9,10 @@ export class CleanupCommand implements CommandModule {
   public describe = 'example command';
   public aliases = ['cleanup'];
 
-  public constructor(private readonly cleanupManager: CleanupManager) { }
+  public constructor(private readonly cleanupManager: CleanupManager) {}
 
   public handler = async (): Promise<void> => {
     await this.cleanupManager.cleanFailedTasks();
     await this.cleanupManager.cleanSuccessfulTasks();
-  }
+  };
 }

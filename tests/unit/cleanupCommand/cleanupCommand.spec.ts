@@ -1,5 +1,5 @@
 import { CleanupCommand } from '../../../src/cleanupCommand/cleanupCommand';
-import { cleanupManagerMock,cleanFailedTasksMock,cleanSuccessfulTasksMock } from '../../mocks/cleanupCommand/cleanupManager';
+import { cleanupManagerMock, cleanFailedTasksMock, cleanSuccessfulTasksMock } from '../../mocks/cleanupCommand/cleanupManager';
 
 describe('CleanupCommand', () => {
   let command: CleanupCommand;

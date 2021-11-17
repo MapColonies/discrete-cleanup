@@ -1,10 +1,10 @@
-import { IngestionParams } from "@map-colonies/mc-model-types";
-import { inject, singleton } from "tsyringe";
-import { JobManagerClient } from "../clients/jobManagerClient";
-import { MapproxyClient } from "../clients/mapproxyClient";
-import { SERVICES } from "../common/constants";
-import { IConfig, IJob } from "../common/interfaces";
-import { IStorageProvider } from "../storageProviders/iStorageProvider";
+import { IngestionParams } from '@map-colonies/mc-model-types';
+import { inject, singleton } from 'tsyringe';
+import { JobManagerClient } from '../clients/jobManagerClient';
+import { MapproxyClient } from '../clients/mapproxyClient';
+import { SERVICES } from '../common/constants';
+import { IConfig, IJob } from '../common/interfaces';
+import { IStorageProvider } from '../storageProviders/iStorageProvider';
 
 @singleton()
 export class CleanupManager {
@@ -29,7 +29,7 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
-      if(expiredBatch.length>0){
+      if (expiredBatch.length > 0) {
         await this.sourcesProvider.deleteDiscretes(expiredBatch);
       }
       await this.tileProvider.deleteDiscretes(currentBatch);
@@ -58,5 +58,4 @@ export class CleanupManager {
     }
     return filteredTasks;
   }
-
 }

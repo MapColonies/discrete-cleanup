@@ -6,16 +6,16 @@ const deleteObjectsMock = jest.fn();
 
 const s3Mock = {
   listObjectsV2: listObjectsV2Mock,
-  deleteObjects: deleteObjectsMock
+  deleteObjects: deleteObjectsMock,
 };
 
 const initS3Mock = (): void => {
- listObjectsV2Mock.mockReturnValue({
-    promise: listObjectsV2PromiseMock
+  listObjectsV2Mock.mockReturnValue({
+    promise: listObjectsV2PromiseMock,
   });
   deleteObjectsMock.mockReturnValue({
-    promise: deleteObjectsPromiseMock
+    promise: deleteObjectsPromiseMock,
   });
-}
+};
 
-export { s3Mock, initS3Mock, listObjectsV2PromiseMock, listObjectsV2Mock, deleteObjectsPromiseMock, deleteObjectsMock }
+export { s3Mock, initS3Mock, listObjectsV2PromiseMock, listObjectsV2Mock, deleteObjectsPromiseMock, deleteObjectsMock };

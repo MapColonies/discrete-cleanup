@@ -1,13 +1,13 @@
-import { JobManagerClient } from "../../../src/clients/jobManagerClient";
+import { JobManagerClient } from '../../../src/clients/jobManagerClient';
 
 const getSuccessNotCleanedJobsMock = jest.fn();
 const getFailedAndNotCleanedJobsMock = jest.fn();
 const markAsCompletedMock = jest.fn();
 
-const jobManagerClientMock ={
+const jobManagerClientMock = {
   getSuccessNotCleanedJobs: getSuccessNotCleanedJobsMock,
   getFailedAndNotCleanedJobs: getFailedAndNotCleanedJobsMock,
-  markAsCompleted: markAsCompletedMock
+  markAsCompleted: markAsCompletedMock,
 } as unknown as JobManagerClient;
 
-export { jobManagerClientMock, getFailedAndNotCleanedJobsMock, getSuccessNotCleanedJobsMock, markAsCompletedMock }
+export { jobManagerClientMock, getFailedAndNotCleanedJobsMock, getSuccessNotCleanedJobsMock, markAsCompletedMock };

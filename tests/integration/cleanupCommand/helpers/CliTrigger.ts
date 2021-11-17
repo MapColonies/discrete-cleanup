@@ -8,6 +8,6 @@ export class CleanupCommandCliTrigger {
   }
 
   public async cleanup(): Promise<void> {
-      await this.callCli(['cleanup']);
+    await this.callCli(['cleanup']);
   }
 }
