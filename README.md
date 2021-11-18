@@ -1,5 +1,15 @@
 # Discrete Cleanup Job
 
+----------------------------------
+
+![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/discrete-cleanup?style=for-the-badge)
+
+![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/discrete-cleanup?style=for-the-badge)
+
+![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/discrete-cleanup?style=for-the-badge)
+
+----------------------------------
+
 The purpose is to clean irrelevant data that is created off the **ingestion cycle**. There are two different scenarios:
 
 1. If the cycle completed successfully - delete the original `.tiff` files, and mark the job as `cleaned`.
