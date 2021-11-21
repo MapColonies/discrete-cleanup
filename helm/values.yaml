@@ -31,6 +31,36 @@ env:
   metrics:
     enabled: false
     url: http://localhost:55681/v1/metrics
+  jobManager:
+    url: http://localhost:8080
+  mapproxyAPI:
+    url: http://localhost:8081
+  tileStorageProvider: S3
+  fs:
+    tilesPath: './tiles'
+    sourcesPath: '/tiffs'
+  s3:
+    maxRetries: 3
+    endpointUrl: http://localhost:9000
+    bucket: raster-tiles-dev
+    apiVersion: 2006-03-01
+    sslEnabled: true
+  batchSize:
+    discreteLayers: 10
+    tiffDirectoryDeletion: 1
+    tilesDeletion: 1000 #s3 default max limit is 10000 so larger batches will be caped to the s3 limit
+  failedCleanupDelayDays: 14
+  httpRetry:
+    attempts: 3
+    delay: exponential
+    shouldResetTimeout: true
+  ingestionJobType: Discrete-Tiling
+
+s3Secret:
+  name: s3-secret
+  create: false #use for stand alone testing, global s3 secret name should be provided for full deployment
+  accessKeyId: ""
+  secretAccessKey: ""
 
 resources:
   enabled: true

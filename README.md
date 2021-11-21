@@ -1,125 +1,46 @@
-# Map Colonies typescript script template
+# Discrete Cleanup Job
 
 ----------------------------------
 
-![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/ts-script-boilerplate?style=for-the-badge)
+![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/discrete-cleanup?style=for-the-badge)
 
-![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/ts-script-boilerplate?style=for-the-badge)
+![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/discrete-cleanup?style=for-the-badge)
 
-![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/ts-script-boilerplate?style=for-the-badge)
+![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/discrete-cleanup?style=for-the-badge)
 
 ----------------------------------
 
-This is a basic repo template for building new MapColonies cli script or cron-job in Typescript.
+The purpose is to clean irrelevant data that is created off the **ingestion cycle**. There are two different scenarios:
 
-### Template Usage Notes:
-- the docker file contains default command to use when running container without additional parameters
-- command handlers can be async or sync functions
-- naming command '$0' will make it the default command
-### Template Features:
+1. If the cycle completed successfully - delete the original `.tiff` files, and mark the job as `cleaned`.
+1. Upon failure - delete the original `.tiff` files, remove the created tiles, remove the discrete layer which was created in the map server using the `Map Server API` and mark as `cleaned`.
 
-- eslint configuration by [@map-colonies/eslint-config](https://github.com/MapColonies/eslint-config)
+## Usage:
+### Docker
+Build the image using the provided `Dockerfile`. A simple `docker build -t discrete-cleanup <dockerfile_location>` should be enough.
 
-- prettier configuration by [@map-colonies/prettier-config](https://github.com/MapColonies/prettier-config)
+Run the image with provided `docker_run.sh` file. You should edit the file and adjust the default configurations.
 
-- jest
+### Running for development
+`npm install` to install the required dependencies. Adjust configurations (detailed below) for your local needs.
+Hit `npm start` to start the process. 
 
-- .nvmrc
+## Configurations:
 
-- Multi stage producton-ready Dockerfile
-
-- commitlint
-
-- git hooks
-
-- logging by [@map-colonies/js-logger](https://github.com/MapColonies/js-logger)
-
-- config load with [node-config](https://www.npmjs.com/package/node-config)
-
-- Tracing and metrics by [@map-colonies/telemetry](https://github.com/MapColonies/telemetry)
-
-- github templates
-
-- bug report
-
-- feature request
-
-- pull request
-
-- github actions
-
-- on pull_request
-
-- LGTM
-
-- test
-
-- lint
-
-- snyk
-
-## Installation
-
-Install deps with npm
-
-```bash
-npm install
-```
-### Install Git Hooks
-```bash
-npx husky install
-```
-
-## Run Locally
-
-Clone the project
-
-```bash
-
-git clone https://link-to-project
-
-```
-
-Go to the project directory
-
-```bash
-
-cd my-project
-
-```
-
-Install dependencies
-
-```bash
-
-npm install
-
-```
-
-Start the script
-
-```bash
-
-npm run start -- [parameter1] [parameter 2] [...]
-
-```
-
-## Running Tests
-
-To run tests, run the following command
-
-```bash
-
-npm run test
-
-```
-
-To only run unit tests:
-```bash
-npm run test:unit
-```
-
-To only run integration tests:
-```bash
-npm run test:integration
-```
+* `LOG_LEVEL` - Could be one of the following: `error`, `warn`, `info`, `debug`.
+* `DB_URL` - The URL of the discrete ingestion database.
+* `MAPPROXY_API_URL` - the URL of the map server API.
+* `TILES_STORAGE_PROVIDER` - The service provider in which the tiles will be created - could be one of the following: `S3`, `FS`.
+* `FS_TILES_LOCATION` - Where are the tiles are located in the `FS`. Works only if `SERVER_PROVIDER` is `FS`.
+* `S3_API_VERSION` - The API version of `S3`.
+* `S3_ENDPOINT` - The endpoint to the `S3` server.
+* `S3_ACCESS_KEY_ID` 
+* `S3_SECRET_ACCESS_KEY`
+* `S3_SSL_ENABLED`
+* `S3_MAX_RETRIES` - The maximum number of retries to connect to the `S3` server.
+* `S3_BUCKET`
+* `BATCH_SIZE_DISCRETE_LAYERS` - The number of discrete layers to delete in one batch.
+* `BATCH_SIZE_DIRECTORY_TIFF_DELETION` - The number of directories of tiffs to delete in one batch.
+* `BATCH_SIZE_TILES_DELETION` - The number of tiles delete in one batch. 
+    For `S3`: This is the number of files to delete from the `S3` server - maximum is 1000.
+    For `FS`: This is the number of directories in one batch.
