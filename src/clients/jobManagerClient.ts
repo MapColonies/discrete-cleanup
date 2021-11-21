@@ -19,6 +19,7 @@ export class JobManagerClient extends HttpClient {
       isCleaned: false,
       status: 'Completed',
       type: this.ingestionJobType,
+      shouldReturnTasks: false
     });
   }
 
@@ -27,6 +28,7 @@ export class JobManagerClient extends HttpClient {
       isCleaned: false,
       status: 'Failed',
       type: this.ingestionJobType,
+      shouldReturnTasks: false
     });
   }
 

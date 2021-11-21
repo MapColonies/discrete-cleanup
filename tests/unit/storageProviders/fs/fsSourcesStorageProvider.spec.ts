@@ -24,7 +24,7 @@ describe('fsSourcesStorageProvider', () => {
     jest.resetAllMocks();
   });
 
-  it('Checks tiffs parser functionality', async () => {
+  it('Checks tiffs deletion functionality', async () => {
     await fsSourcesStorageProvider.deleteDiscretes(discreteArray);
 
     expect(deleteDirMock).toHaveBeenCalledTimes(urisArray.length);
