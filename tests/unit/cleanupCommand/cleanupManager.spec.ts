@@ -1,7 +1,7 @@
 import { configMock, initConfig, setConfigValue } from '../../mocks/config';
 import { createStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
-import { jobManagerClientMock, getFailedAndNotCleanedJobsMock, markAsCompletedMock } from '../../mocks/clients/jobManagerClient';
+import { jobManagerClientMock, getFailedAndNotCleanedIngestionJobsMock, markAsCompletedMock } from '../../mocks/clients/jobManagerClient';
 import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
 
 const filedJobs = [
@@ -83,13 +83,13 @@ describe('CleanupManager', () => {
     jest.useRealTimers();
   });
 
-  describe('cleanFailedTasks', () => {
+  describe('cleanFailedIngestionTasks', () => {
     it('failed job sources will be deleted only for expired failed jobs', async () => {
-      getFailedAndNotCleanedJobsMock.mockResolvedValue(filedJobs);
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(filedJobs);
       deleteLayersMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
-      await manager.cleanFailedTasks();
+      await manager.cleanFailedIngestionTasks();
 
       const expiredJobs = [filedJobs[2]];
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs);

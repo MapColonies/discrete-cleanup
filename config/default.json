@@ -45,5 +45,6 @@
     "delay": "exponential",
     "shouldResetTimeout": true
   },
-  "ingestion_job_type": "Discrete-Tiling"
+  "ingestion_job_type": "Discrete-Tiling",
+  "incoming_sync_job_type": "syncTarget"
 }

@@ -1,5 +1,5 @@
 import { CleanupCommand } from '../../../src/cleanupCommand/cleanupCommand';
-import { cleanupManagerMock, cleanFailedTasksMock, cleanSuccessfulTasksMock } from '../../mocks/cleanupCommand/cleanupManager';
+import { cleanupManagerMock, cleanFailedIngestionTasksMock, cleanSuccessfulIngestionTasksMock, cleanFailedIncomingSyncTasksMock } from '../../mocks/cleanupCommand/cleanupManager';
 
 describe('CleanupCommand', () => {
   let command: CleanupCommand;
@@ -17,8 +17,9 @@ describe('CleanupCommand', () => {
     it('calls all cleanup methods', async () => {
       await command.handler();
 
-      expect(cleanFailedTasksMock).toHaveBeenCalledTimes(1);
-      expect(cleanSuccessfulTasksMock).toHaveBeenCalledTimes(1);
+      expect(cleanFailedIngestionTasksMock).toHaveBeenCalledTimes(1);
+      expect(cleanSuccessfulIngestionTasksMock).toHaveBeenCalledTimes(1);
+      expect(cleanFailedIncomingSyncTasksMock).toHaveBeenCalledTimes(1);
     });
   });
 });
