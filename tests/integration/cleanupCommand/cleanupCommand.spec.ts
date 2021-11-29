@@ -9,8 +9,9 @@ import { SERVICES } from '../../../src/common/constants';
 import { createStorageProviderMock, IStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import {
   jobManagerClientMock,
-  getFailedAndNotCleanedJobsMock,
-  getSuccessNotCleanedJobsMock,
+  getFailedAndNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedIngestionJobsMock,
+  getFailedAndNotCleanedIncomingSyncJobsMock,
   markAsCompletedMock,
 } from '../../mocks/clients/jobManagerClient';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
@@ -71,11 +72,14 @@ describe('CleanupCommand', function () {
     it('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
       setConfigValue('batch_size.discreteLayers', 100);
-      setConfigValue('failed_cleanup_delay_days', 14);
-      const failedAndNotCleaned = discreteArray.slice(0, 3);
-      const successAndNotCleaned = discreteArray.slice(3);
-      getFailedAndNotCleanedJobsMock.mockResolvedValue(failedAndNotCleaned);
-      getSuccessNotCleanedJobsMock.mockResolvedValue(successAndNotCleaned);
+      setConfigValue('failed_cleanup_delay_days.ingestion', 14);
+      setConfigValue('failed_cleanup_delay_days.sync', 14);
+      const failedAndNotCleaned = discreteArray.slice(0, 2);
+      const successAndNotCleaned = discreteArray.slice(2, 4);
+      const failedSyncAndNotCleaned = discreteArray.slice(4);
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedAndNotCleaned);
+      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(successAndNotCleaned);
+      getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedSyncAndNotCleaned);
       deleteLayersMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 

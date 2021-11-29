@@ -57,9 +57,15 @@
       "__format": "number"
     }
   },
-  "failed_cleanup_delay_days": {
-    "__name": "FAILED_CLEANUP_DELAY_DAYS",
-    "__format": "number"
+  "failed_cleanup_delay_days":{
+    "ingestion": {
+      "__name": "FAILED_INGESTION_CLEANUP_DELAY_DAYS",
+      "__format": "number"
+    },
+    "sync":{
+      "__name": "FAILED_SYNC_CLEANUP_DELAY_DAYS",
+      "__format": "number"
+    }
   },
   "httpRetry": {
     "attempts": {

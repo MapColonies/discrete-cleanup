@@ -21,7 +21,7 @@ export class CleanupManager {
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
-    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days');
+    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.ingestion');
     const deleteDate = new Date();
     deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
     const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIngestionJobs();
@@ -49,13 +49,18 @@ export class CleanupManager {
   }
 
   public async cleanFailedIncomingSyncTasks(): Promise<void> {
+    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.sync');
+    const deleteDate = new Date();
+    deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
     const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIncomingSyncJobs();
-
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
-      await this.tileProvider.deleteDiscretes(currentBatch);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
-      const completedDiscretes = currentBatch.filter((el) => !failedDiscreteLayers.includes(el));
+      const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
+      if (expiredBatch.length > 0) {
+        await this.tileProvider.deleteDiscretes(expiredBatch);
+      }
+      const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       await this.jobManager.markAsCompleted(completedDiscretes);
     }
   }

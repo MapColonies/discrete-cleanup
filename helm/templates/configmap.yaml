@@ -30,7 +30,8 @@ data:
   BATCH_SIZE_DISCRETE_LAYERS: {{ .Values.env.batchSize.discreteLayers | quote }}
   BATCH_SIZE_DIRECTORY_TIFF_DELETION: {{ .Values.env.batchSize.tiffDirectoryDeletion | quote }}
   BATCH_SIZE_TILES_DELETION: {{ .Values.env.batchSize.tilesDeletion | quote }}
-  FAILED_CLEANUP_DELAY_DAYS: {{ .Values.env.failedCleanupDelayDays | quote }}
+  FAILED_INGESTION_CLEANUP_DELAY_DAYS: {{ .Values.env.failedCleanupDelayDays.ingestion | quote }}
+  FAILED_SYNC_CLEANUP_DELAY_DAYS: {{ .Values.env.failedCleanupDelayDays.sync | quote }}
   HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts | quote }}
   HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay | quote }}
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}

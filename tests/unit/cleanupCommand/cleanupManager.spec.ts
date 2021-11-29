@@ -1,10 +1,15 @@
 import { configMock, initConfig, setConfigValue } from '../../mocks/config';
 import { createStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
-import { jobManagerClientMock, getFailedAndNotCleanedIngestionJobsMock, markAsCompletedMock } from '../../mocks/clients/jobManagerClient';
+import {
+  jobManagerClientMock,
+  getFailedAndNotCleanedIngestionJobsMock,
+  markAsCompletedMock,
+  getFailedAndNotCleanedIncomingSyncJobsMock,
+} from '../../mocks/clients/jobManagerClient';
 import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
 
-const filedJobs = [
+const failedJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
     resourceId: 'demo_1',
@@ -85,16 +90,31 @@ describe('CleanupManager', () => {
 
   describe('cleanFailedIngestionTasks', () => {
     it('failed job sources will be deleted only for expired failed jobs', async () => {
-      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(filedJobs);
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedJobs);
       deleteLayersMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await manager.cleanFailedIngestionTasks();
 
-      const expiredJobs = [filedJobs[2]];
+      const expiredJobs = [failedJobs[2]];
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs);
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(filedJobs);
-      expect(deleteLayersMock).toHaveBeenCalledWith(filedJobs);
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(failedJobs);
+      expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
+    });
+  });
+
+  describe('cleanFailedIncomingSyncTasks', () => {
+    it('expired failed jobs tiles will be deleted', async () => {
+      getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedJobs);
+      deleteLayersMock.mockResolvedValue([]);
+      markAsCompletedMock.mockResolvedValue(undefined);
+
+      await manager.cleanFailedIncomingSyncTasks();
+
+      const expiredJobs = [failedJobs[2]];
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs);
+      expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
       expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
     });
   });

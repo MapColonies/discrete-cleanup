@@ -49,7 +49,9 @@ env:
     discreteLayers: 10
     tiffDirectoryDeletion: 1
     tilesDeletion: 1000 #s3 default max limit is 10000 so larger batches will be caped to the s3 limit
-  failedCleanupDelayDays: 14
+  failedCleanupDelayDays:
+    ingestion: 14
+    sync: 14
   httpRetry:
     attempts: 3
     delay: exponential
