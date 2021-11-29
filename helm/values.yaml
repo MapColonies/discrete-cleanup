@@ -68,7 +68,7 @@ env:
     delay: exponential
     shouldResetTimeout: true
   ingestionJobType: Discrete-Tiling
-  incomingSyncTaskType: syncTarget
+  incomingSyncJobType: syncTarget
 
 s3Secret:
   name: s3-secret
