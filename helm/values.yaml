@@ -22,6 +22,20 @@ cron:
   concurrencyPolicy: Forbid
   restartPolicy: OnFailure
 
+storage:
+  tiffsPersistenceDisk:
+    mountPath: /layerSources
+    pvcName: ingestion-source-pvc # ingestion deployment creates this pvc
+    sourcesSubPath: ingestion-source
+    useEmptyDir: false # for local standalone deployment only
+  tilesPersistenceDisk:
+    mountPath: /tiles
+    pvcName: internal-pvc # ingestion deployment creates this pvc
+    tilesSubPath: tiles
+    useEmptyDir: true # for s3 or local-standalone deployments
+
+    
+
 env:
   logLevel: info
   logPrettyPrintEnabled: false
@@ -36,9 +50,6 @@ env:
   mapproxyAPI:
     url: http://localhost:8081
   tileStorageProvider: S3
-  fs:
-    tilesPath: './tiles'
-    sourcesPath: '/tiffs'
   s3:
     maxRetries: 3
     endpointUrl: http://localhost:9000

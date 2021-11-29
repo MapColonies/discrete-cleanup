@@ -40,9 +40,39 @@ spec:
                     secretKeyRef:
                       name: {{ .Values.s3Secret.name }}
                       key: secretAccessKey
+                - name: FS_TILES_LOCATION
+                  value: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
+                - name: FS_SOURCES_LOCATION
+                  value: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
               envFrom:
                 - configMapRef:
                     name: {{ $releaseName }}-{{ $chartName }}-configmap
+              volumeMounts:
+                - name: sources-volume
+                  mountPath: {{ .Values.discreteCleanup.tiffsPersistenceDisk.mountPath }}
+                  {{- if .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
+                  subPath: {{ .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
+                  {{- end }}
+                - name: tiles-folder
+                  mountPath: {{ .Values.discreteCleanup.tilesPersistenceDisk.mountPath }}
+                  {{- if .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
+                  subPath: {{ .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
+                  {{- end }}
+              volumes:
+                - name: sources-volume
+                {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
+                  emptyDir: {}
+                {{- else }}
+                  persistentVolumeClaim:
+                    claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
+                {{- end }}
+                - name: tiles-folder
+                {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}
+                  emptyDir: {}
+                {{- else }}
+                  persistentVolumeClaim:
+                    claimName: {{ .Values.storage.tilesPersistenceDisk.pvcName }}
+                {{- end }}
               {{- if .Values.resources.enabled }}
               resources:
                 {{- toYaml .Values.resources.value | nindent 16 }}

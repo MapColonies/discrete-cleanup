@@ -20,8 +20,6 @@ data:
   JOB_MANAGER_URL: {{ .Values.env.jobManager.url | quote }}
   MAPPROXY_API_URL: {{ .Values.env.mapproxyAPI.url | quote }}
   TILES_STORAGE_PROVIDER: {{ .Values.env.tileStorageProvider | quote }}
-  FS_TILES_LOCATION: {{ .Values.env.fs.tilesPath | quote }}
-  FS_SOURCES_LOCATION: {{ .Values.env.fs.sourcesPath | quote }}
   S3_API_VERSION: {{ .Values.env.s3.apiVersion | quote }}
   S3_ENDPOINT: {{ .Values.env.s3.endpointUrl | quote }}
   S3_SSL_ENABLED: {{ .Values.env.s3.sslEnabled | quote }}
