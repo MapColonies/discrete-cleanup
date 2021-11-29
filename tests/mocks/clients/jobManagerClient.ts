@@ -12,8 +12,10 @@ const jobManagerClientMock = {
   markAsCompleted: markAsCompletedMock,
 } as unknown as JobManagerClient;
 
-export { jobManagerClientMock, 
+export {
+  jobManagerClientMock,
   getSuccessNotCleanedIngestionJobsMock,
-  getFailedAndNotCleanedIngestionJobsMock, 
+  getFailedAndNotCleanedIngestionJobsMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
-  markAsCompletedMock };
+  markAsCompletedMock,
+};

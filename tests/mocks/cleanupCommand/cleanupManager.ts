@@ -7,7 +7,7 @@ const cleanFailedIncomingSyncTasksMock = jest.fn();
 const cleanupManagerMock = {
   cleanFailedIngestionTasks: cleanFailedIngestionTasksMock,
   cleanSuccessfulIngestionTasks: cleanSuccessfulIngestionTasksMock,
-  cleanFailedIncomingSyncTasks: cleanFailedIncomingSyncTasksMock
+  cleanFailedIncomingSyncTasks: cleanFailedIncomingSyncTasksMock,
 } as unknown as CleanupManager;
 
 export { cleanupManagerMock, cleanSuccessfulIngestionTasksMock, cleanFailedIngestionTasksMock, cleanFailedIncomingSyncTasksMock };

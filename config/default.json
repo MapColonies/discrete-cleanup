@@ -39,7 +39,7 @@
     "tiffDirectoryDeletion": 1,
     "tilesDeletion": 1
   },
-  "failed_cleanup_delay_days":{
+  "failed_cleanup_delay_days": {
     "ingestion": 14,
     "sync": 14
   },
