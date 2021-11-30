@@ -30,6 +30,7 @@ spec:
               image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ $imageTag }}
               {{- end }}
               env:
+              {{- if eq (upper .Values.env.tileStorageProvider) "S3" }}
                 - name: S3_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -40,8 +41,10 @@ spec:
                     secretKeyRef:
                       name: {{ .Values.s3Secret.name }}
                       key: secretAccessKey
+                {{- else }}
                 - name: FS_TILES_LOCATION
                   value: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
+                {{- end }}
                 - name: FS_SOURCES_LOCATION
                   value: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
               envFrom:
@@ -49,32 +52,36 @@ spec:
                     name: {{ $releaseName }}-{{ $chartName }}-configmap
               volumeMounts:
                 - name: sources-volume
-                  mountPath: {{ .Values.discreteCleanup.tiffsPersistenceDisk.mountPath }}
+                  mountPath: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
                   {{- if .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   subPath: {{ .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   {{- end }}
+                {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
                 - name: tiles-folder
-                  mountPath: {{ .Values.discreteCleanup.tilesPersistenceDisk.mountPath }}
+                  mountPath: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
                   {{- if .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
-                  subPath: {{ .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
+                  subPath: {{ .Values.storage.tilesPersistenceDisk.tilesSubPath }}
                   {{- end }}
-              volumes:
-                - name: sources-volume
-                {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
-                  emptyDir: {}
-                {{- else }}
-                  persistentVolumeClaim:
-                    claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
                 {{- end }}
-                - name: tiles-folder
-                {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}
-                  emptyDir: {}
-                {{- else }}
-                  persistentVolumeClaim:
-                    claimName: {{ .Values.storage.tilesPersistenceDisk.pvcName }}
-                {{- end }}
-              {{- if .Values.resources.enabled }}
+            {{- if .Values.resources.enabled }}
               resources:
                 {{- toYaml .Values.resources.value | nindent 16 }}
               {{- end }}
+          volumes:
+            - name: sources-volume
+            {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
+              emptyDir: {}
+            {{- else }}
+              persistentVolumeClaim:
+                claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
+            {{- end }}
+            {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
+            - name: tiles-folder
+              {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}
+              emptyDir: {}
+              {{- else }}
+              persistentVolumeClaim:
+                claimName: {{ .Values.storage.tilesPersistenceDisk.pvcName }}
+              {{- end }}
+            {{- end }}
 {{- end -}}

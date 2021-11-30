@@ -32,7 +32,7 @@ storage:
     mountPath: /tiles
     pvcName: internal-pvc # ingestion deployment creates this pvc
     tilesSubPath: tiles
-    useEmptyDir: true # for s3 or local-standalone deployments
+    useEmptyDir: false # for local standalone deployment only
 
     
 
