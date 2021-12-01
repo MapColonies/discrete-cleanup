@@ -20,11 +20,11 @@ export class CleanupManager {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
   }
 
-  public async cleanFailedTasks(): Promise<void> {
-    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days');
+  public async cleanFailedIngestionTasks(): Promise<void> {
+    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.ingestion');
     const deleteDate = new Date();
     deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
-    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedJobs();
+    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIngestionJobs();
 
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
@@ -39,12 +39,29 @@ export class CleanupManager {
     }
   }
 
-  public async cleanSuccessfulTasks(): Promise<void> {
-    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedJobs();
+  public async cleanSuccessfulIngestionTasks(): Promise<void> {
+    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs();
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       await this.sourcesProvider.deleteDiscretes(currentBatch);
       await this.jobManager.markAsCompleted(currentBatch);
+    }
+  }
+
+  public async cleanFailedIncomingSyncTasks(): Promise<void> {
+    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.sync');
+    const deleteDate = new Date();
+    deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
+    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIncomingSyncJobs();
+    for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
+      const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
+      const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
+      const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
+      if (expiredBatch.length > 0) {
+        await this.tileProvider.deleteDiscretes(expiredBatch);
+      }
+      const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
+      await this.jobManager.markAsCompleted(completedDiscretes);
     }
   }
 

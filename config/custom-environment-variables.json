@@ -58,8 +58,14 @@
     }
   },
   "failed_cleanup_delay_days": {
-    "__name": "FAILED_CLEANUP_DELAY_DAYS",
-    "__format": "number"
+    "ingestion": {
+      "__name": "FAILED_INGESTION_CLEANUP_DELAY_DAYS",
+      "__format": "number"
+    },
+    "sync": {
+      "__name": "FAILED_SYNC_CLEANUP_DELAY_DAYS",
+      "__format": "number"
+    }
   },
   "httpRetry": {
     "attempts": {
@@ -71,6 +77,7 @@
       "__name": "HTTP_RETRY_RESET_TIMEOUT",
       "__format": "boolean"
     },
-    "ingestion_job_type": "INGESTION_JOB_TYPE"
+    "ingestion_job_type": "INGESTION_JOB_TYPE",
+    "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE"
   }
 }

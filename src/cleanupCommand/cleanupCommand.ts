@@ -12,7 +12,8 @@ export class CleanupCommand implements CommandModule {
   public constructor(private readonly cleanupManager: CleanupManager) {}
 
   public handler = async (): Promise<void> => {
-    await this.cleanupManager.cleanFailedTasks();
-    await this.cleanupManager.cleanSuccessfulTasks();
+    await this.cleanupManager.cleanFailedIngestionTasks();
+    await this.cleanupManager.cleanSuccessfulIngestionTasks();
+    await this.cleanupManager.cleanFailedIncomingSyncTasks();
   };
 }
