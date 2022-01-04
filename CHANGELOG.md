@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/MapColonies/discrete-cleanup/compare/v1.3.1...v1.3.2) (2022-01-04)
+
+
+### Bug Fixes
+
+* added pull secret to helm ([#4](https://github.com/MapColonies/discrete-cleanup/issues/4)) ([c264cb6](https://github.com/MapColonies/discrete-cleanup/commit/c264cb6a21cac793bae91138bee3920c7ebc1276))
+* fix config and injection ([#5](https://github.com/MapColonies/discrete-cleanup/issues/5)) ([e3c63b2](https://github.com/MapColonies/discrete-cleanup/commit/e3c63b2133a7049635b81146fed5e5b94e559423))
+
 ### [1.3.1](https://github.com/MapColonies/discrete-cleanup/compare/v1.3.0...v1.3.1) (2021-12-01)
 
 ## 1.3.0 (2021-11-21)
