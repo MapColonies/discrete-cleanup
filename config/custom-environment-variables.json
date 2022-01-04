@@ -76,8 +76,8 @@
     "shouldResetTimeout": {
       "__name": "HTTP_RETRY_RESET_TIMEOUT",
       "__format": "boolean"
-    },
-    "ingestion_job_type": "INGESTION_JOB_TYPE",
-    "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE"
-  }
+    }
+  },
+  "ingestion_job_type": "INGESTION_JOB_TYPE",
+  "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE"
 }
