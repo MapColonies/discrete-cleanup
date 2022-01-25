@@ -1,6 +1,6 @@
 apiVersion: v2
-name: ts-script-boilerplate
-description: A Helm chart for ts-script-boilerplate cron job
+name: discrete-cleanup
+description: A Helm chart for discrete-cleanup cron job
 type: application
 version: 1.3.2
 appVersion: 1.3.2

@@ -6,11 +6,11 @@ global:
 
 authentication:
   ca:
-    enabled: true
+    enabled: false
     useExternal: false
     externalSecretName: ""
   ssl:
-    enabled: true
+    enabled: false
     useExternal: false
     externalSecretName: ""
 
@@ -27,16 +27,16 @@ enabled: true
 environment: development
 
 cloudProvider:
-  dockerRegistryUrl: my-registry-url.io
-  imagePullSecretName: 'my-registry-secret'
+  dockerRegistryUrl: '10.45.130.11:5000'
+  imagePullSecretName: 'acr-registry'
   flavor: openshift
 
 image:
-  repository: discrete-cleanup
+  repository: 'discrete-cleanup'
   tag: 'latest'
 
 cron:
-  schedule:  '0 0 * * *'
+  schedule:  '*/1 * * * *'
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -54,7 +54,6 @@ storage:
     tilesSubPath: tiles
     useEmptyDir: false # for local standalone deployment only
 
-    
 
 env:
   logLevel: info
@@ -66,10 +65,10 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   jobManager:
-    url: http://localhost:8080
+    url: http://10.45.130.45:8080
   mapproxyAPI:
     url: http://localhost:8081
-  tileStorageProvider: S3
+  tileStorageProvider: FS
   s3:
     maxRetries: 3
     endpointUrl: http://localhost:9000
@@ -97,7 +96,7 @@ s3Secret:
   secretAccessKey: ""
 
 resources:
-  enabled: true
+  enabled: false
   value:
     limits:
       cpu: 100m
