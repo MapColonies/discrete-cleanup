@@ -1,19 +1,19 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "ts-script-boilerplate.name" . -}}
-{{- $cloudProviderFlavor := include "ts-script-boilerplate.cloudProviderFlavor" . -}}
-{{- $cloudProviderDockerRegistryUrl := include "ts-script-boilerplate.cloudProviderDockerRegistryUrl" . -}}
-{{- $imageTag := include "ts-server-boilerplate.tag" . -}}
+{{- $chartName := include "discrete-cleanup.name" . -}}
+{{- $cloudProviderFlavor := include "discrete-cleanup.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
+{{- $imageTag := include "discrete-cleanup.tag" . -}}
 {{- if .Values.enabled -}}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ $releaseName }}-{{ $chartName }}
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
-    environment: {{ include "ts-script-boilerplate.environment" . }}
+    environment: {{ include "discrete-cleanup.environment" . }}
     release: {{ $releaseName }}
-    {{- include "ts-script-boilerplate.labels" . | nindent 4 }}
+    {{- include "discrete-cleanup.labels" . | nindent 4 }}
 spec:
   schedule: {{ .Values.cron.schedule | quote }}
   successfulJobsHistoryLimit: {{ .Values.cron.successfulJobsHistoryLimit }}
@@ -55,11 +55,13 @@ spec:
                 - configMapRef:
                     name: {{ $releaseName }}-{{ $chartName }}-configmap
               volumeMounts:
+               {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
                 - name: sources-volume
                   mountPath: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
                   {{- if .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   subPath: {{ .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   {{- end }}
+                {{- end }}
                 {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
                 - name: tiles-folder
                   mountPath: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
@@ -72,6 +74,7 @@ spec:
                 {{- toYaml .Values.resources.value | nindent 16 }}
               {{- end }}
           volumes:
+          {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
             - name: sources-volume
             {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
               emptyDir: {}
@@ -79,6 +82,7 @@ spec:
               persistentVolumeClaim:
                 claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
             {{- end }}
+          {{- end }}
             {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
             - name: tiles-folder
               {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}

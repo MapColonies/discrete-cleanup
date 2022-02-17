@@ -79,5 +79,19 @@
     }
   },
   "ingestion_job_type": "INGESTION_JOB_TYPE",
-  "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE"
+  "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE",
+  "cleanupTypes": {
+    "failedIngestionTasks": {
+      "__name": "CLEANUP_TYPES_FAILED_INGESTION_TASKS",
+      "__format": "boolean"
+    },
+    "successfulIngestion": {
+      "__name": "CLEANUP_TYPES_SUCCESSFUL_INGESTION",
+      "__format": "boolean"
+    },
+    "failedIncomingSyncTasks": {
+      "__name": "CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS",
+      "__format": "boolean"
+    }
+  }
 }
