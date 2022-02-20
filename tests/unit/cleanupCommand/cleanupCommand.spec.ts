@@ -5,15 +5,18 @@ import {
   cleanSuccessfulIngestionTasksMock,
   cleanFailedIncomingSyncTasksMock,
 } from '../../mocks/cleanupCommand/cleanupManager';
+import { configMock, initConfig, clearConfig } from '../../mocks/config';
 
 describe('CleanupCommand', () => {
   let command: CleanupCommand;
 
   beforeEach(() => {
-    command = new CleanupCommand(cleanupManagerMock);
+    initConfig();
+    command = new CleanupCommand(configMock, cleanupManagerMock);
   });
 
   afterEach(() => {
+    clearConfig();
     jest.resetAllMocks();
     jest.restoreAllMocks();
   });

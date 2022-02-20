@@ -13,7 +13,7 @@ cloudProvider:
   flavor: openshift
 
 image:
-  repository: ts-script-boilerplate
+  repository: discrete-cleanup
   tag: 'latest'
 
 cron:
@@ -70,6 +70,12 @@ env:
     shouldResetTimeout: true
   ingestionJobType: Discrete-Tiling
   incomingSyncJobType: syncTarget
+  cleanupTypes:
+    failedIngestionTasks: true
+    successfulIngestion: true
+    failedIncomingSyncTasks: true
+
+
 
 s3Secret:
   name: s3-secret
