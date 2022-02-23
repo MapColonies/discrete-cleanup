@@ -4,7 +4,7 @@
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
 {{- $imageTag := include "discrete-cleanup.tag" . -}}
 {{- if .Values.enabled -}}
-apiVersion: batch/v1
+apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ $releaseName }}-{{ $chartName }}
