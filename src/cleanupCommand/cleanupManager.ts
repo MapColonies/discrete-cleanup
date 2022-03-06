@@ -35,7 +35,7 @@ export class CleanupManager {
       await this.tileProvider.deleteDiscretes(currentBatch);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
-      await this.jobManager.markAsCompleted(completedDiscretes);
+      await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
     }
   }
 
@@ -44,7 +44,7 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       await this.sourcesProvider.deleteDiscretes(currentBatch);
-      await this.jobManager.markAsCompleted(currentBatch);
+      await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
     }
   }
 
