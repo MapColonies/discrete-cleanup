@@ -1,7 +1,7 @@
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
-import { IngestionParams, ProductType } from '@map-colonies/mc-model-types';
+import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../common/constants';
 import { IConfig, IJob } from '../common/interfaces';
 
@@ -16,11 +16,8 @@ export class MapproxyClient extends HttpClient {
 
     for (const discrete of discreteLayers) {
       const productType = discrete.parameters.metadata.productType as string;
-      this.logger.info(`Deleting layer: [${discrete.resourceId}-${discrete.version}-${productType}]`);
-      mapProxyLayersToDelete.push(`${discrete.resourceId}-${discrete.version}-${productType}`);
-      if (productType == ProductType.ORTHOPHOTO_HISTORY) {
-        mapProxyLayersToDelete.push(`${discrete.resourceId}-${ProductType.ORTHOPHOTO}`);
-      }
+      this.logger.info(`Deleting layer: [${discrete.resourceId}-${productType}]`);
+      mapProxyLayersToDelete.push(`${discrete.resourceId}-${productType}`);
     }
     this.logger.info(`Deleting layers [${mapProxyLayersToDelete.join(',')}] from mapproxy`);
 

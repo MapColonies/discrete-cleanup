@@ -16,12 +16,7 @@ export class FsTileStorageProvider extends FsStorageProviderBase {
 
   protected parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
     const directories = discreteArray.map((discrete) => {
-      return path.join(
-        this.fsTilesLocation,
-        discrete.parameters.metadata.productId as string,
-        discrete.parameters.metadata.productVersion as string,
-        discrete.parameters.metadata.productType as string
-      );
+      return path.join(this.fsTilesLocation, discrete.parameters.metadata.productId as string, discrete.parameters.metadata.productType as string);
     });
     return directories;
   }
