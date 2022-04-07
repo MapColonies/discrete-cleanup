@@ -50,7 +50,6 @@ describe('tile deletion', () => {
 
     const expectedPrefix = [
       testDiscretes[0].parameters.metadata.productId as string,
-      testDiscretes[0].parameters.metadata.productVersion as string,
       testDiscretes[0].parameters.metadata.productType as string,
     ].join('/');
     expect(listObjectsV2Mock).toHaveBeenCalledTimes(2);
