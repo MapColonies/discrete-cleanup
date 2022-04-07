@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.5.0...v1.6.0) (2022-04-07)
+
+
+### Features
+
+* update model types ([#11](https://github.com/MapColonies/discrete-cleanup/issues/11)) ([a3b7fe0](https://github.com/MapColonies/discrete-cleanup/commit/a3b7fe010e8effcd5a23f64c78cad5088f4776a4)), closes [#12](https://github.com/MapColonies/discrete-cleanup/issues/12)
+
 ## [1.5.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.4.0...v1.5.0) (2022-03-06)
 
 
