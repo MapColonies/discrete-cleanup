@@ -4,6 +4,15 @@
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
 {{- $imageTag := include "discrete-cleanup.tag" . -}}
 {{- if .Values.enabled -}}
+
+{{ $sslSecretName := ternary .Values.authentication.ssl.externalSecretName (printf "%s%s" .Release.Name "-open-ssl") .Values.authentication.ssl.useExternal }}
+
+{{- if .Values.authentication.ssl.enabled }}
+{{- if and .Values.authentication.ssl.useExternal (not .Values.authentication.ssl.externalSecretName) }}
+{{- fail "When using external ssl secret the value for .Values.authentication.ssl.externalSecretName should be set" }}
+{{- end }}
+{{- end }}
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -51,6 +60,12 @@ spec:
                 {{- end }}
                 - name: FS_SOURCES_LOCATION
                   value: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
+                {{- if .Values.rasterCommon.ca.secretName }}
+                - name: REQUESTS_CA_BUNDLE
+                  value: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                - name: NODE_EXTRA_CA_CERTS
+                  value: {{ printf "[%s/%s]" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                {{- end }}
               envFrom:
                 - configMapRef:
                     name: {{ $releaseName }}-{{ $chartName }}-configmap
@@ -68,6 +83,16 @@ spec:
                   {{- if .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
                   subPath: {{ .Values.storage.tilesPersistenceDisk.tilesSubPath }}
                   {{- end }}
+                {{- end }}
+                {{- if .Values.rasterCommon.ca.secretName }}
+                - mountPath: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                  name: root-ca
+                  subPath: {{ quote .Values.rasterCommon.ca.key }}
+                {{- end }}
+                {{- if .Values.authentication.ssl.enabled }}
+                - name: open-ssl
+                  mountPath: "/etc/ssl/etc/ssl/openssl.cnf"
+                  subPath: "openssl.cnf"
                 {{- end }}
             {{- if .Values.resources.enabled }}
               resources:
@@ -91,5 +116,15 @@ spec:
               persistentVolumeClaim:
                 claimName: {{ .Values.storage.tilesPersistenceDisk.pvcName }}
               {{- end }}
+            {{- end }}
+            {{- if .Values.rasterCommon.ca.secretName }}
+            - name: root-ca
+              secret:
+                secretName: {{ .Values.rasterCommon.ca.secretName }}
+            {{- end }}
+            {{- if .Values.authentication.ssl.enabled }}
+            - name: open-ssl
+              secret:
+                secretName: {{ $sslSecretName }}
             {{- end }}
 {{- end -}}
