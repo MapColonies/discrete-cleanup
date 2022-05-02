@@ -49,5 +49,10 @@
     "shouldResetTimeout": true
   },
   "ingestion_job_type": "Discrete-Tiling",
-  "incoming_sync_job_type": "syncTarget"
+  "incoming_sync_job_type": "syncTarget",
+  "cleanupTypes": {
+    "failedIngestionTasks": true,
+    "successfulIngestion": true,
+    "failedIncomingSyncTasks": true
+  }
 }

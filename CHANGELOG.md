@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.5.0...v1.6.0) (2022-04-07)
+
+
+### Features
+
+* update model types ([#11](https://github.com/MapColonies/discrete-cleanup/issues/11)) ([a3b7fe0](https://github.com/MapColonies/discrete-cleanup/commit/a3b7fe010e8effcd5a23f64c78cad5088f4776a4)), closes [#12](https://github.com/MapColonies/discrete-cleanup/issues/12)
+
+## [1.5.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.4.0...v1.5.0) (2022-03-06)
+
+
+### Features
+
+* removing file list from cleaned jobs ([#9](https://github.com/MapColonies/discrete-cleanup/issues/9)) ([76ba02b](https://github.com/MapColonies/discrete-cleanup/commit/76ba02b6ebe799b6828fae2ae87e4825e88babc2))
+
+
+### Bug Fixes
+
+* azure compatability ([#8](https://github.com/MapColonies/discrete-cleanup/issues/8)) ([826ee85](https://github.com/MapColonies/discrete-cleanup/commit/826ee85a55ec2baa3f4854455b5f5e6470989881))
+
+## [1.4.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.3.2...v1.4.0) (2022-02-20)
+
+
+### Features
+
+* added config to disable cleanup with pvc ([#7](https://github.com/MapColonies/discrete-cleanup/issues/7)) ([d62c327](https://github.com/MapColonies/discrete-cleanup/commit/d62c3276b28469093fa17428df518dda6de7fc0a))
+
 ### [1.3.2](https://github.com/MapColonies/discrete-cleanup/compare/v1.3.1...v1.3.2) (2022-01-04)
 
 

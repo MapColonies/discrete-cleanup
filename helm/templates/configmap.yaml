@@ -35,4 +35,7 @@ data:
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}
   INGESTION_JOB_TYPE: {{ .Values.env.ingestionJobType | quote }}
   INCOMING_SYNC_JOB_TYPE: {{ .Values.env.incomingSyncJobType | quote }}
+  CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
+  CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
+  CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: {{ .Values.env.cleanupTypes.failedIncomingSyncTasks | quote }}
 {{- end }}

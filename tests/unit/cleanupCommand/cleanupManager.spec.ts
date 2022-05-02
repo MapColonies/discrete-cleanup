@@ -5,6 +5,7 @@ import {
   jobManagerClientMock,
   getFailedAndNotCleanedIngestionJobsMock,
   markAsCompletedMock,
+  markAsCompletedAndRemoveFilesMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
 } from '../../mocks/clients/jobManagerClient';
 import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
@@ -100,7 +101,7 @@ describe('CleanupManager', () => {
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(failedJobs);
       expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
-      expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
+      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
     });
   });
 

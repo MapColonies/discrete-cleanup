@@ -2,7 +2,7 @@
 {{- $chartName := include "discrete-cleanup.name" . -}}
 {{- $cloudProviderFlavor := include "discrete-cleanup.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
-{{- $imageTag := include "ts-server-boilerplate.tag" . -}}
+{{- $imageTag := include "discrete-cleanup.tag" . -}}
 {{- if .Values.enabled -}}
 
 {{ $sslSecretName := ternary .Values.authentication.ssl.externalSecretName (printf "%s%s" .Release.Name "-open-ssl") .Values.authentication.ssl.useExternal }}
@@ -70,11 +70,13 @@ spec:
                 - configMapRef:
                     name: {{ $releaseName }}-{{ $chartName }}-configmap
               volumeMounts:
+               {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
                 - name: sources-volume
                   mountPath: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
                   {{- if .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   subPath: {{ .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
                   {{- end }}
+                {{- end }}
                 {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
                 - name: tiles-folder
                   mountPath: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
@@ -97,6 +99,7 @@ spec:
                 {{- toYaml .Values.resources.value | nindent 16 }}
               {{- end }}
           volumes:
+          {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
             - name: sources-volume
             {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
               emptyDir: {}
@@ -104,6 +107,7 @@ spec:
               persistentVolumeClaim:
                 claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
             {{- end }}
+          {{- end }}
             {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
             - name: tiles-folder
               {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}

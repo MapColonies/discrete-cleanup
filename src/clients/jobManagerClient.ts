@@ -57,4 +57,19 @@ export class JobManagerClient extends HttpClient {
     }
     await Promise.all(updateArray);
   }
+
+  public async markAsCompletedAndRemoveFiles(notCleaned: IJob<IngestionParams>[]): Promise<void> {
+    const updateArray = [];
+    for (const discrete of notCleaned) {
+      const parameters = discrete.parameters as { fileNames?: string[] };
+      delete parameters.fileNames;
+      updateArray.push(
+        this.put(`/jobs/${discrete.id}`, {
+          isCleaned: true,
+          parameters,
+        })
+      );
+    }
+    await Promise.all(updateArray);
+  }
 }
