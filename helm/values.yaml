@@ -4,6 +4,11 @@ global:
   metrics: {}
   environment: {}
 
+rasterCommon:
+  ca:
+    secretName: ''
+    path: '/usr/local/share/ca-certificates'
+    key: 'ca.crt'
 authentication:
   ca:
     enabled: false
