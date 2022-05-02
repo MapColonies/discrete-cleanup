@@ -6,14 +6,10 @@ global:
 
 rasterCommon:
   ca:
-    secretName: ''
+    secretName: 'ssss'
     path: '/usr/local/share/ca-certificates'
     key: 'ca.crt'
 authentication:
-  ca:
-    enabled: false
-    useExternal: false
-    externalSecretName: ""
   ssl:
     enabled: false
     useExternal: false
