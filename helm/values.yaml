@@ -9,6 +9,32 @@ rasterCommon:
     secretName: 'ssss'
     path: '/usr/local/share/ca-certificates'
     key: 'ca.crt'
+  serviceUrls:
+    jobManager: http://localhost:8080
+    mapproxyApi: http://localhost:8081
+  storage:
+    tilesStorageProvider: S3
+    fs:
+      ingestionSourcePvc:
+        enabled: true
+        name: ingestion-source-pvc
+        subPath: ingestion-source
+      internalPvc:
+        enabled: true
+        name: internal-pvc
+        tilesSubPath: tiles
+    s3:
+      endpointUrl: "localhost:9000"
+      tilesBucket: "tiles-dev"
+      sslEnabled: false
+      secretName: "ingestion-s3-secret"
+  jobManagement:
+    ingestion:
+      jobType: Discrete-Tiling
+    sync:
+      incoming:
+        JobType: "syncTarget"
+
 authentication:
   ssl:
     enabled: false
@@ -23,6 +49,17 @@ local:
   certs:
     ca: "certs/ca.crt"
     ssl: "certs/openssl.cnf"
+  s3:
+    secret:
+      create: false #use for stand alone testing, global s3 secret name should be provided for full deployment
+      accessKeyId: ""
+      secretAccessKey: ""
+  fs:
+    sources:
+      useEmptyDir: false # for local standalone deployment only
+    tiles:
+      useEmptyDir: false # for local standalone deployment only
+
 
 enabled: true
 environment: development
@@ -43,20 +80,6 @@ cron:
   concurrencyPolicy: Forbid
   restartPolicy: OnFailure
 
-storage:
-  tiffsPersistenceDisk:
-    mountPath: /layerSources
-    pvcName: ingestion-source-pvc # ingestion deployment creates this pvc
-    sourcesSubPath: ingestion-source
-    useEmptyDir: false # for local standalone deployment only
-  tilesPersistenceDisk:
-    mountPath: /tiles
-    pvcName: internal-pvc # ingestion deployment creates this pvc
-    tilesSubPath: tiles
-    useEmptyDir: false # for local standalone deployment only
-
-    
-
 env:
   logLevel: info
   logPrettyPrintEnabled: false
@@ -66,17 +89,9 @@ env:
   metrics:
     enabled: false
     url: http://localhost:55681/v1/metrics
-  jobManager:
-    url: http://localhost:8080
-  mapproxyAPI:
-    url: http://localhost:8081
-  tileStorageProvider: S3
   s3:
     maxRetries: 3
-    endpointUrl: http://localhost:9000
-    bucket: raster-tiles-dev
     apiVersion: 2006-03-01
-    sslEnabled: true
   batchSize:
     discreteLayers: 10
     tiffDirectoryDeletion: 1
@@ -88,20 +103,10 @@ env:
     attempts: 3
     delay: exponential
     shouldResetTimeout: true
-  ingestionJobType: Discrete-Tiling
-  incomingSyncJobType: syncTarget
   cleanupTypes:
     failedIngestionTasks: true
     successfulIngestion: true
     failedIncomingSyncTasks: true
-
-
-
-s3Secret:
-  name: s3-secret
-  create: false #use for stand alone testing, global s3 secret name should be provided for full deployment
-  accessKeyId: ""
-  secretAccessKey: ""
 
 resources:
   enabled: true

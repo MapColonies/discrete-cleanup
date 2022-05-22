@@ -3,6 +3,7 @@
 {{- $cloudProviderFlavor := include "discrete-cleanup.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
 {{- $imageTag := include "discrete-cleanup.tag" . -}}
+
 {{- if .Values.enabled -}}
 
 {{ $sslSecretName := ternary .Values.authentication.ssl.externalSecretName (printf "%s%s" .Release.Name "-open-ssl") .Values.authentication.ssl.useExternal }}
@@ -43,23 +44,23 @@ spec:
               image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ $imageTag }}
               {{- end }}
               env:
-              {{- if eq (upper .Values.env.tileStorageProvider) "S3" }}
+              {{- if eq (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
                 - name: S3_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.s3Secret.name }}
+                      name: {{ .Values.rasterCommon.storage.s3.secretName }}
                       key: accessKeyId
                 - name: S3_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.s3Secret.name }}
+                      name: {{ .Values.rasterCommon.storage.s3.secretName }}
                       key: secretAccessKey
                 {{- else }}
                 - name: FS_TILES_LOCATION
-                  value: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
+                  value: /tiles
                 {{- end }}
                 - name: FS_SOURCES_LOCATION
-                  value: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
+                  value: /layerSources
                 {{- if .Values.rasterCommon.ca.secretName }}
                 - name: REQUESTS_CA_BUNDLE
                   value: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
@@ -72,16 +73,16 @@ spec:
               volumeMounts:
                {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
                 - name: sources-volume
-                  mountPath: {{ .Values.storage.tiffsPersistenceDisk.mountPath }}
-                  {{- if .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
-                  subPath: {{ .Values.storage.tiffsPersistenceDisk.sourcesSubPath }}
+                  mountPath: /layerSources
+                  {{- if .Values.rasterCommon.storage.fs.ingestionSourcePvc.subPath }}
+                  subPath: {{ .Values.rasterCommon.storage.fs.ingestionSourcePvc.subPath }}
                   {{- end }}
                 {{- end }}
-                {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
+                  {{- if ne (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
                 - name: tiles-folder
-                  mountPath: {{ .Values.storage.tilesPersistenceDisk.mountPath }}
-                  {{- if .Values.storage.tilesPersistenceDisk.sourcesSubPath }}
-                  subPath: {{ .Values.storage.tilesPersistenceDisk.tilesSubPath }}
+                  mountPath: /tiles
+                  {{- if .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
+                  subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
                   {{- end }}
                 {{- end }}
                 {{- if .Values.rasterCommon.ca.secretName }}
@@ -101,20 +102,20 @@ spec:
           volumes:
           {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
             - name: sources-volume
-            {{- if .Values.storage.tiffsPersistenceDisk.useEmptyDir }}
+            {{- if .Values.local.fs.sources.useEmptyDir }}
               emptyDir: {}
             {{- else }}
               persistentVolumeClaim:
-                claimName: {{ .Values.storage.tiffsPersistenceDisk.pvcName }}
+                claimName: {{ .Values.rasterCommon.storage.fs.ingestionSourcePvc.name }}
             {{- end }}
           {{- end }}
-            {{- if ne (upper .Values.env.tileStorageProvider) "S3" }}
+            {{- if ne (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
             - name: tiles-folder
-              {{- if .Values.storage.tilesPersistenceDisk.useEmptyDir }}
+              {{- if .Values.local.fs.tiles.useEmptyDir }}
               emptyDir: {}
               {{- else }}
               persistentVolumeClaim:
-                claimName: {{ .Values.storage.tilesPersistenceDisk.pvcName }}
+                claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
               {{- end }}
             {{- end }}
             {{- if .Values.rasterCommon.ca.secretName }}
