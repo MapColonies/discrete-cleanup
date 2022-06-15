@@ -3,6 +3,7 @@
 {{- $cloudProviderFlavor := include "discrete-cleanup.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
 {{- $imageTag := include "discrete-cleanup.tag" . -}}
+{{- $cloudProviderImagePullSecretName := include "discrete-cleanup.cloudProviderImagePullSecretName" . -}}
 
 {{- if .Values.enabled -}}
 
@@ -33,10 +34,10 @@ spec:
     spec:
       template:
         spec:
-         {{- if .Values.cloudProvider.imagePullSecretName }}
-          imagePullSecrets:
-            - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
-          {{- end }}
+        {{- if $cloudProviderImagePullSecretName }}
+        imagePullSecrets:
+          - name: {{ $cloudProviderImagePullSecretName | quote }}
+        {{- end }}
           restartPolicy: {{ .Values.cron.restartPolicy }}
           containers:
             - name: {{ $releaseName }}-{{ $chartName }}-deployment
