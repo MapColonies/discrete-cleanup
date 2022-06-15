@@ -34,10 +34,10 @@ spec:
     spec:
       template:
         spec:
-        {{- if $cloudProviderImagePullSecretName }}
-        imagePullSecrets:
-          - name: {{ $cloudProviderImagePullSecretName | quote }}
-        {{- end }}
+          {{- if $cloudProviderImagePullSecretName }}
+          imagePullSecrets:
+            - name: {{ $cloudProviderImagePullSecretName | quote }}
+          {{- end }}
           restartPolicy: {{ .Values.cron.restartPolicy }}
           containers:
             - name: {{ $releaseName }}-{{ $chartName }}-deployment
