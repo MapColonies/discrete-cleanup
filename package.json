@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@map-colonies/js-logger": "^0.0.3",
-    "@map-colonies/mc-model-types": "^11.0.0",
+    "@map-colonies/mc-model-types": "file:../mc-models/map-colonies-mc-model-types-12.0.3.tgz",
     "@map-colonies/mc-utils": "^1.1.2",
     "@map-colonies/read-pkg": "0.0.1",
     "@map-colonies/telemetry": "3.0.0",
