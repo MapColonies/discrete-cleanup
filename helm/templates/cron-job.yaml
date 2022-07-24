@@ -34,6 +34,16 @@ spec:
     spec:
       template:
         spec:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: nodeAffinity
+                    operator: In
+                    values:
+                    - nodeAffinityPod
+                topologyKey: kubernetes.io/hostname        
           {{- if $cloudProviderImagePullSecretName }}
           imagePullSecrets:
             - name: {{ $cloudProviderImagePullSecretName | quote }}
