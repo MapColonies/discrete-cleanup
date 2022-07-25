@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.2](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.1...v1.6.2) (2022-07-24)
+
+
+### Bug Fixes
+
+* azure updated token ([41bb0cd](https://github.com/MapColonies/discrete-cleanup/commit/41bb0cd31318ffb86e1cba51d2725d7124800edc))
+* new azure token value ([#19](https://github.com/MapColonies/discrete-cleanup/issues/19)) ([e3ca2b2](https://github.com/MapColonies/discrete-cleanup/commit/e3ca2b2026dcd00e66bbc95f5339803bb51a5bf7))
+
+### [1.6.1](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.0...v1.6.1) (2022-07-24)
+
+
+### Bug Fixes
+
+* update mc-models version ([#17](https://github.com/MapColonies/discrete-cleanup/issues/17)) ([b1bfc76](https://github.com/MapColonies/discrete-cleanup/commit/b1bfc762d3ccdfdfdbed686e8317bb2bc12b9dc0))
+
 ## [1.6.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.5.0...v1.6.0) (2022-04-07)
 
 
