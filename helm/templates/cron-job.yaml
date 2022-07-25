@@ -34,6 +34,7 @@ spec:
     spec:
       template:
         spec:
+          {{- if .Values.rasterCommon.useNodeAffinity }}
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -43,7 +44,8 @@ spec:
                     operator: In
                     values:
                     - nodeAffinityPod
-                topologyKey: kubernetes.io/hostname        
+                topologyKey: kubernetes.io/hostname
+          {{- end }}
           {{- if $cloudProviderImagePullSecretName }}
           imagePullSecrets:
             - name: {{ $cloudProviderImagePullSecretName | quote }}
