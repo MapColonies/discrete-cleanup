@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.3](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.2...v1.6.3) (2022-09-08)
+
+
+### Bug Fixes
+
+* added node affinity use condition ([#18](https://github.com/MapColonies/discrete-cleanup/issues/18)) ([c989f91](https://github.com/MapColonies/discrete-cleanup/commit/c989f9122a044101b37ce43356c607fb8a82b620))
+
 ### [1.6.2](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.1...v1.6.2) (2022-07-24)
 
 
