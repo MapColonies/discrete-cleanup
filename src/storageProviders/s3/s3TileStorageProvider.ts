@@ -56,7 +56,7 @@ export class S3TileStorageProvider implements IStorageProvider {
 
   private parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
     const prefixes = discreteArray.map((discrete) => {
-      return [discrete.parameters.metadata.productId as string, discrete.parameters.metadata.productType as string].join('/');
+      return [discrete.parameters.layerRelativePath as string].join('/');
     });
     return prefixes;
   }
@@ -75,6 +75,7 @@ export class S3TileStorageProvider implements IStorageProvider {
     const itemsToDelete = res.Contents?.map((content) => {
       return { Key: content.Key as string };
     });
+    console.log(itemsToDelete)
     /* eslint-enable @typescript-eslint/naming-convention */
     return {
       itemsToDelete,
