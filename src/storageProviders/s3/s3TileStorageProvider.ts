@@ -75,7 +75,6 @@ export class S3TileStorageProvider implements IStorageProvider {
     const itemsToDelete = res.Contents?.map((content) => {
       return { Key: content.Key as string };
     });
-    console.log(itemsToDelete)
     /* eslint-enable @typescript-eslint/naming-convention */
     return {
       itemsToDelete,
