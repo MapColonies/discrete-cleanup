@@ -48,10 +48,7 @@ describe('tile deletion', () => {
 
     await tileStorageProvider.deleteDiscretes(testDiscretes);
 
-    const expectedPrefix = [
-      testDiscretes[0].parameters.metadata.id as string,
-      testDiscretes[0].parameters.metadata.displayPath as string,
-    ].join('/');
+    const expectedPrefix = [testDiscretes[0].parameters.metadata.id as string, testDiscretes[0].parameters.metadata.displayPath as string].join('/');
     expect(listObjectsV2Mock).toHaveBeenCalledTimes(2);
     expect(listObjectsV2Mock).toHaveBeenCalledWith({
       Bucket: 'testBucket',
