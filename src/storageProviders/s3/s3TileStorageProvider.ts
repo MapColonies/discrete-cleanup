@@ -56,7 +56,7 @@ export class S3TileStorageProvider implements IStorageProvider {
 
   private parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
     const prefixes = discreteArray.map((discrete) => {
-      return [discrete.parameters.layerRelativePath as string].join('/');
+      return [discrete.parameters.metadata.id as string, discrete.parameters.metadata.displayPath].join('/');
     });
     return prefixes;
   }
