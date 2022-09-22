@@ -13,6 +13,7 @@ import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
 const failedJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+    displayPath: '2c8d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4sed',
     resourceId: 'demo_1',
     version: 'tiles',
     tasks: [],
@@ -28,6 +29,7 @@ const failedJobs = [
   },
   {
     id: '8ca6057a-e464-4682-8f11-a9754a88171e',
+    displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
     resourceId: 'demo_2',
     version: 'tiles',
     tasks: [],
@@ -43,6 +45,7 @@ const failedJobs = [
   },
   {
     id: 'e429f88c-3c8c-49f7-9afe-aac6fc786467',
+    displayPath: '1r6d6bcd-bbfd-4b2d-9b5d-ab8dfbbd1rfd',
     resourceId: 'demo_3',
     version: 'tiles',
     tasks: [],
