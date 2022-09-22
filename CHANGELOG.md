@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.3...v1.7.0) (2022-09-22)
+
+
+### Features
+
+* added displayPath support ([#20](https://github.com/MapColonies/discrete-cleanup/issues/20)) ([6c7cf20](https://github.com/MapColonies/discrete-cleanup/commit/6c7cf201806d55fcaed21a425febb492a92e853c))
+
 ### [1.6.3](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.2...v1.6.3) (2022-09-08)
 
 
