@@ -7,29 +7,27 @@ import { IConfig, IJob } from '../common/interfaces';
 
 @singleton()
 export class JobManagerClient extends HttpClient {
-  private readonly ingestionJobType: string;
   private readonly incomingSyncJobType: string;
 
   public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, @inject(SERVICES.LOGGER) logger: Logger) {
     super(logger, config.get<string>('job_manager.url'), 'JobManager', config.get<IHttpRetryConfig>('httpRetry'));
-    this.ingestionJobType = config.get('ingestion_job_type');
     this.incomingSyncJobType = config.get('incoming_sync_job_type');
   }
 
-  public async getSuccessNotCleanedIngestionJobs(): Promise<IJob<IngestionParams>[]> {
+  public async getSuccessNotCleanedIngestionJobs(jobType: string): Promise<IJob<IngestionParams>[]> {
     return this.get<IJob<IngestionParams>[]>('/jobs', {
       isCleaned: false,
       status: 'Completed',
-      type: this.ingestionJobType,
+      type: jobType,
       shouldReturnTasks: false,
     });
   }
 
-  public async getFailedAndNotCleanedIngestionJobs(): Promise<IJob<IngestionParams>[]> {
+  public async getFailedAndNotCleanedIngestionJobs(jobType: string): Promise<IJob<IngestionParams>[]> {
     return this.get<IJob<IngestionParams>[]>('/jobs', {
       isCleaned: false,
       status: 'Failed',
-      type: this.ingestionJobType,
+      type: jobType,
       shouldReturnTasks: false,
     });
   }

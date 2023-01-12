@@ -33,7 +33,8 @@ data:
   HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts | quote }}
   HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay | quote }}
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}
-  INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.jobType | quote }}
+  NEW_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.new.jobType | quote }}
+  UPDATE_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.update.jobType | quote }}
   INCOMING_SYNC_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.sync.incoming.JobType | quote }}
   CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
