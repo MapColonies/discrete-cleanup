@@ -87,7 +87,7 @@ describe('CleanupCommand', function () {
 
       expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
       expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledWith(failedAndNotCleaned);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledWith(successAndNotCleaned);
     });
   });

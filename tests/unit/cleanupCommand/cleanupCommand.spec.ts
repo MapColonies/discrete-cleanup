@@ -26,7 +26,7 @@ describe('CleanupCommand', () => {
       await command.handler();
 
       expect(cleanFailedIngestionTasksMock).toHaveBeenCalledTimes(1);
-      expect(cleanSuccessfulIngestionTasksMock).toHaveBeenCalledTimes(1);
+      expect(cleanSuccessfulIngestionTasksMock).toHaveBeenCalledTimes(2);
       expect(cleanFailedIncomingSyncTasksMock).toHaveBeenCalledTimes(1);
     });
   });

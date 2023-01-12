@@ -48,7 +48,8 @@
     "delay": "exponential",
     "shouldResetTimeout": true
   },
-  "ingestion_job_type": "Discrete-Tiling",
+  "new_ingestion_job_type": "Ingestion_New",
+  "update_ingestion_job_type": "Ingestion_Update",
   "incoming_sync_job_type": "syncTarget",
   "cleanupTypes": {
     "failedIngestionTasks": true,

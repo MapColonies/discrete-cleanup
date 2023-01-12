@@ -11,14 +11,21 @@ export class CleanupCommand implements CommandModule {
   public describe = 'example command';
   public aliases = ['cleanup'];
 
-  public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, private readonly cleanupManager: CleanupManager) {}
+  private readonly updateIngestionJobType: string;
+  private readonly newIngestionJobType: string;
+
+  public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, private readonly cleanupManager: CleanupManager) {
+    this.newIngestionJobType = config.get('new_ingestion_job_type');
+    this.updateIngestionJobType = config.get('update_ingestion_job_type');
+  }
 
   public handler = async (): Promise<void> => {
     if (this.config.get<boolean>('cleanupTypes.failedIngestionTasks')) {
       await this.cleanupManager.cleanFailedIngestionTasks();
     }
     if (this.config.get<boolean>('cleanupTypes.successfulIngestion')) {
-      await this.cleanupManager.cleanSuccessfulIngestionTasks();
+      await this.cleanupManager.cleanSuccessfulIngestionTasks(this.newIngestionJobType);
+      await this.cleanupManager.cleanSuccessfulIngestionTasks(this.updateIngestionJobType);
     }
     if (this.config.get<boolean>('cleanupTypes.failedIncomingSyncTasks')) {
       await this.cleanupManager.cleanFailedIncomingSyncTasks();

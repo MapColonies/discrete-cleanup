@@ -81,7 +81,8 @@
       "__format": "boolean"
     }
   },
-  "ingestion_job_type": "INGESTION_JOB_TYPE",
+  "new_ingestion_job_type": "NEW_INGESTION_JOB_TYPE",
+  "update_ingestion_job_type": "UPDATE_INGESTION_JOB_TYPE",
   "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE",
   "cleanupTypes": {
     "failedIngestionTasks": {

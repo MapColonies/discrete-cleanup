@@ -9,6 +9,7 @@ import { IStorageProvider } from '../storageProviders/iStorageProvider';
 @singleton()
 export class CleanupManager {
   private readonly discreteBatchSize: number;
+  private readonly newIngestionJobType: string;
 
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
@@ -18,13 +19,14 @@ export class CleanupManager {
     private readonly jobManager: JobManagerClient
   ) {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
+    this.newIngestionJobType = config.get('new_ingestion_job_type');
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
     const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.ingestion');
     const deleteDate = new Date();
     deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
-    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIngestionJobs();
+    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.newIngestionJobType);
 
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
@@ -39,8 +41,8 @@ export class CleanupManager {
     }
   }
 
-  public async cleanSuccessfulIngestionTasks(): Promise<void> {
-    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs();
+  public async cleanSuccessfulIngestionTasks(ingestionJobType: string): Promise<void> {
+    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       await this.sourcesProvider.deleteDiscretes(currentBatch);
