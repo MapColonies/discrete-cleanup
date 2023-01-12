@@ -10,7 +10,7 @@ import { IStorageProvider } from '../storageProviders/iStorageProvider';
 export class CleanupManager {
   private readonly discreteBatchSize: number;
   private readonly newIngestionJobType: string;
-    
+
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
     @inject(SERVICES.SOURCES_PROVIDER) private readonly sourcesProvider: IStorageProvider,
