@@ -31,7 +31,8 @@ rasterCommon:
       secretName: "ingestion-s3-secret"
   jobManagement:
     ingestion:
-      jobType: Discrete-Tiling
+      new:
+        jobType: Discrete-Tiling
     sync:
       incoming:
         JobType: "syncTarget"

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/MapColonies/discrete-cleanup/compare/v1.7.0...v1.7.1) (2022-10-19)
+
+
+### Bug Fixes
+
+* job type key ([#21](https://github.com/MapColonies/discrete-cleanup/issues/21)) ([1da2359](https://github.com/MapColonies/discrete-cleanup/commit/1da235937292d526bbf46f67ea6b05889f3c2f54))
+* sslEnabled env format ([#22](https://github.com/MapColonies/discrete-cleanup/issues/22)) ([8cc875e](https://github.com/MapColonies/discrete-cleanup/commit/8cc875e2e6796f97f43c555b5ea24ae3f3ca96d8))
+
+## [1.7.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.3...v1.7.0) (2022-09-22)
+
+
+### Features
+
+* added displayPath support ([#20](https://github.com/MapColonies/discrete-cleanup/issues/20)) ([6c7cf20](https://github.com/MapColonies/discrete-cleanup/commit/6c7cf201806d55fcaed21a425febb492a92e853c))
+
 ### [1.6.3](https://github.com/MapColonies/discrete-cleanup/compare/v1.6.2...v1.6.3) (2022-09-08)
 
 
