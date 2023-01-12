@@ -29,7 +29,8 @@
   "tiles_storage_provider": "TILES_STORAGE_PROVIDER",
   "fs": {
     "tiles_location": "FS_TILES_LOCATION",
-    "sources_location": "FS_SOURCES_LOCATION"
+    "sources_location": "FS_SOURCES_LOCATION",
+    "blacklist_sources": "BLACK_LIST_SOURCES"
   },
   "s3": {
     "apiVersion": "S3_API_VERSION",
