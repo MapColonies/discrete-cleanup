@@ -32,8 +32,6 @@ export class CleanupManager {
     deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
 
     const notCleanedAndFailedNew = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.newIngestionJobType);
-    const notCleanedAndFailedUpdate = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.updateIngestionJobType);
-
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
@@ -47,6 +45,7 @@ export class CleanupManager {
       await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
     }
 
+    const notCleanedAndFailedUpdate = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.updateIngestionJobType);
     for (let i = 0; i < notCleanedAndFailedUpdate.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedUpdate.slice(i, i + this.discreteBatchSize);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
