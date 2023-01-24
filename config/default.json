@@ -24,7 +24,7 @@
   "fs": {
     "tiles_location": "./tiles",
     "sources_location": "/tiffs",
-    "blacklist_sources": "test"
+    "blacklist_sources_location": "test"
   },
   "s3": {
     "apiVersion": "2006-03-01",

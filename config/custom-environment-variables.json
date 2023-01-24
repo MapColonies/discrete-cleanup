@@ -30,7 +30,7 @@
   "fs": {
     "tiles_location": "FS_TILES_LOCATION",
     "sources_location": "FS_SOURCES_LOCATION",
-    "blacklist_sources": "BLACK_LIST_SOURCES"
+    "blacklist_sources_location": "FS_BLACK_LIST_SOURCES_LOCATION"
   },
   "s3": {
     "apiVersion": "S3_API_VERSION",

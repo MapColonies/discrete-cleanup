@@ -23,22 +23,14 @@ export class CleanupManager {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
     this.newIngestionJobType = config.get('new_ingestion_job_type');
     this.updateIngestionJobType = config.get('update_ingestion_job_type');
-    this.sourceBlackList = config.get<string>('fs.blacklist_sources').split(',');
+    this.sourceBlackList = config.get<string>('fs.blacklist_sources_location').split(',');
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
-    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.ingestion');
-    const deleteDate = new Date();
-    deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
-
     const notCleanedAndFailedNew = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.newIngestionJobType);
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
-      const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
-      if (expiredBatch.length > 0) {
-        const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
-        await this.sourcesProvider.deleteDiscretes(blackListFlitteredBatch);
-      }
+      const expiredBatch = await this.deleteExpiredFailedTasks(currentBatch);
       await this.tileProvider.deleteDiscretes(currentBatch);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
@@ -48,12 +40,7 @@ export class CleanupManager {
     const notCleanedAndFailedUpdate = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.updateIngestionJobType);
     for (let i = 0; i < notCleanedAndFailedUpdate.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedUpdate.slice(i, i + this.discreteBatchSize);
-      const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
-      if (expiredBatch.length > 0) {
-        const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
-        await this.sourcesProvider.deleteDiscretes(blackListFlitteredBatch);
-      }
-
+      const expiredBatch = await this.deleteExpiredFailedTasks(currentBatch);
       await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
     }
   }
@@ -105,5 +92,18 @@ export class CleanupManager {
       }
     }
     return filteredTasks;
+  }
+
+  private async deleteExpiredFailedTasks(tasks: IJob<IngestionParams>[]): Promise<IJob<IngestionParams>[]> {
+    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.ingestion');
+    const deleteDate = new Date();
+    deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
+
+    const expiredBatch = this.filterExpiredFailedTasks(tasks, deleteDate);
+    if (expiredBatch.length > 0) {
+      const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
+      await this.sourcesProvider.deleteDiscretes(blackListFilteredBatch);
+    }
+    return expiredBatch;
   }
 }
