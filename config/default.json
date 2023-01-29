@@ -23,7 +23,8 @@
   "tiles_storage_provider": "S3",
   "fs": {
     "tiles_location": "./tiles",
-    "sources_location": "/tiffs"
+    "sources_location": "/tiffs",
+    "blacklist_sources_location": "test"
   },
   "s3": {
     "apiVersion": "2006-03-01",
