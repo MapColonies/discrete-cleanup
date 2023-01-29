@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.7.1...v1.8.0) (2023-01-29)
+
+
+### Features
+
+* add support for update ingestion job (MAPCO-2800) ([#24](https://github.com/MapColonies/discrete-cleanup/issues/24)) ([40ba666](https://github.com/MapColonies/discrete-cleanup/commit/40ba6666a21a76f47bde51fcfd6a98fa0564a771))
+
+
+### Bug Fixes
+
+* update cleanup failed logic ([#25](https://github.com/MapColonies/discrete-cleanup/issues/25)) ([07f48a4](https://github.com/MapColonies/discrete-cleanup/commit/07f48a4cb9095bc7f36d100952f873966185144e)), closes [#2](https://github.com/MapColonies/discrete-cleanup/issues/2)
+
 ### [1.7.1](https://github.com/MapColonies/discrete-cleanup/compare/v1.7.0...v1.7.1) (2022-10-19)
 
 
