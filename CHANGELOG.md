@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.0...v1.8.1) (2023-04-20)
+
+
+### Bug Fixes
+
+* chart ([#26](https://github.com/MapColonies/discrete-cleanup/issues/26)) ([c91b7de](https://github.com/MapColonies/discrete-cleanup/commit/c91b7defc2b4be366b49a7e1bd8e9c9c3c675423))
+
 ## [1.8.0](https://github.com/MapColonies/discrete-cleanup/compare/v1.7.1...v1.8.0) (2023-01-29)
 
 
