@@ -94,7 +94,7 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   fs:
-    blacklist_sources_location: "test_dir"
+    blacklist_sources_location: ["test_dir"]
   s3:
     maxRetries: 3
     apiVersion: 2006-03-01
