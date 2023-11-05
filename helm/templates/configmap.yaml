@@ -39,5 +39,5 @@ data:
   CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
   CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: {{ .Values.env.cleanupTypes.failedIncomingSyncTasks | quote }}
-  FS_BLACK_LIST_SOURCES_LOCATION: {{ .Values.env.fs.blacklist_sources_location | quote }}
+  FS_BLACK_LIST_SOURCES_LOCATION: {{ .Values.env.fs.blacklist_sources_location | toJson | quote }}
 {{- end }}
