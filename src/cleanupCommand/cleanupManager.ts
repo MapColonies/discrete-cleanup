@@ -25,7 +25,6 @@ export class CleanupManager {
     this.newIngestionJobType = config.get('new_ingestion_job_type');
     this.updateIngestionJobType = config.get('update_ingestion_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
-    console.log(this.sourceBlackList, 123);
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
   }
 
