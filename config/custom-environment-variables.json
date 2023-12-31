@@ -84,7 +84,9 @@
   },
   "new_ingestion_job_type": "NEW_INGESTION_JOB_TYPE",
   "update_ingestion_job_type": "UPDATE_INGESTION_JOB_TYPE",
+  "swap_update_ingestion_job_type": "SWAP_UPDATE_INGESTION_JOB_TYPE",
   "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE",
+  "export_job_type": "EXPORT_JOB_TYPE",
   "cleanupTypes": {
     "failedIngestionTasks": {
       "__name": "CLEANUP_TYPES_FAILED_INGESTION_TASKS",
@@ -96,6 +98,10 @@
     },
     "failedIncomingSyncTasks": {
       "__name": "CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS",
+      "__format": "boolean"
+    },
+    "successfulSwapUpdate": {
+      "__name": "CLEANUP_TYPES_SUCCESSFUL_SWAP_UPDATE_TASKS",
       "__format": "boolean"
     }
   }

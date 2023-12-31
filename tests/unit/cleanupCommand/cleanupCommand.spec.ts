@@ -4,6 +4,7 @@ import {
   cleanFailedIngestionTasksMock,
   cleanSuccessfulIngestionTasksMock,
   cleanFailedIncomingSyncTasksMock,
+  cleanSuccessfulSwappedLayersTasksMock,
 } from '../../mocks/cleanupCommand/cleanupManager';
 import { configMock, initConfig, clearConfig } from '../../mocks/config';
 
@@ -28,6 +29,7 @@ describe('CleanupCommand', () => {
       expect(cleanFailedIngestionTasksMock).toHaveBeenCalledTimes(1);
       expect(cleanSuccessfulIngestionTasksMock).toHaveBeenCalledTimes(2);
       expect(cleanFailedIncomingSyncTasksMock).toHaveBeenCalledTimes(1);
+      expect(cleanSuccessfulSwappedLayersTasksMock).toHaveBeenCalledTimes(1);
     });
   });
 });

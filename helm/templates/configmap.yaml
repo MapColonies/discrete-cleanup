@@ -35,9 +35,12 @@ data:
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}
   NEW_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.new.jobType | quote }}
   UPDATE_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.update.jobType | quote }}
+  SWAP_UPDATE_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.updateSwap.jobType | quote }}
   INCOMING_SYNC_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.sync.incoming.JobType | quote }}
+  EXPORT_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.exporter.JobType | quote }}
   CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
   CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: {{ .Values.env.cleanupTypes.failedIncomingSyncTasks | quote }}
+  CLEANUP_TYPES_SUCCESSFUL_SWAP_UPDATE_TASKS: {{ .Values.env.cleanupTypes.successfulSwapUpdate | quote }}
   FS_BLACK_LIST_SOURCES_LOCATION: {{ .Values.env.fs.blacklist_sources_location | toJson | quote }}
 {{- end }}

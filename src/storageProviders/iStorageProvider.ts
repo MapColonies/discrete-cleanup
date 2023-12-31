@@ -1,6 +1,6 @@
-import { IngestionParams } from '@map-colonies/mc-model-types';
-import { IJob } from '../common/interfaces';
+// import { IngestionParams } from '@map-colonies/mc-model-types';
+import { IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
 
 export interface IStorageProvider {
-  deleteDiscretes: (discreteArray: IJob<IngestionParams>[]) => Promise<void>;
+  deleteDiscretes: (discreteArray: IJob<IWithCleanDataIngestionParams>[], isSwappedDeletion: boolean) => Promise<void>;
 }

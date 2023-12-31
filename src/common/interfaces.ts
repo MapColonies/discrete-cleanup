@@ -1,3 +1,4 @@
+import { IngestionParams } from '@map-colonies/mc-model-types';
 import { JobStatus } from './enums';
 
 export interface IConfig {
@@ -19,4 +20,13 @@ export interface IJob<T> {
   isCleaned: boolean;
   priority: number;
   tasks?: unknown[];
+}
+export interface ICleanupData {
+  previousRelativePath: string;
+  previousProductVersion: string;
+}
+
+// TODO - Temporary implementation till it will be implemented inside mc-models on IngestionParams interface.
+export interface IWithCleanDataIngestionParams extends IngestionParams {
+  cleanupData?: ICleanupData;
 }

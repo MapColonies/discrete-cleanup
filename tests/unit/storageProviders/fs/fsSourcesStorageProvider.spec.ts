@@ -1,4 +1,4 @@
-import { promises } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import jsLogger from '@map-colonies/js-logger';
 import { FsSourcesStorageProvider } from '../../../../src/storageProviders/fs/fsSourcesStorageProvider';
@@ -14,8 +14,10 @@ let fsSourcesStorageProvider: FsSourcesStorageProvider;
 describe('fsSourcesStorageProvider', () => {
   beforeEach(() => {
     initConfig();
-    deleteDirMock = jest.spyOn(promises, 'rmdir').mockResolvedValue(undefined);
+    deleteDirMock = jest.spyOn(fs.promises, 'rmdir').mockResolvedValue(undefined);
     jest.spyOn(path, 'join').mockImplementation((...args) => args.join('/'));
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+
     fsSourcesStorageProvider = new FsSourcesStorageProvider(logger, configMock);
   });
 
@@ -25,7 +27,7 @@ describe('fsSourcesStorageProvider', () => {
   });
 
   it('Checks tiffs deletion functionality', async () => {
-    await fsSourcesStorageProvider.deleteDiscretes(discreteArray);
+    await fsSourcesStorageProvider.deleteDiscretes(discreteArray, false);
 
     expect(deleteDirMock).toHaveBeenCalledTimes(urisArray.length);
     for (const uri of urisArray) {

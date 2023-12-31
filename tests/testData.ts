@@ -1,5 +1,5 @@
-import { IngestionParams } from '@map-colonies/mc-model-types';
-import { IJob } from '../src/common/interfaces';
+// import { IngestionParams } from '@map-colonies/mc-model-types';
+import { IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
 
 const discreteArray = [
   {
@@ -193,7 +193,46 @@ const discreteArray = [
     reason: '',
     isCleaned: true,
   },
-] as unknown as IJob<IngestionParams>[];
+] as unknown as IJob<IWithCleanDataIngestionParams>[];
+
+const swapDiscreteArray = [
+  {
+    id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+    resourceId: 'demo_1',
+    version: 'tiles',
+    tasks: [
+      {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        parameters: {
+          minZoom: 0,
+          maxZoom: 8,
+        },
+        updateDate: '2021-03-15T08:06:29.117Z',
+        status: 'Pending',
+        reason: '',
+        attempts: 0,
+      },
+    ],
+    parameters: {
+      fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
+      originDirectory: 'fakeDir1/fakeDir2',
+      metadata: {
+        productId: 'demo_1',
+        productVersion: '5.0',
+        productType: 'OrthophotoHistory',
+      },
+      cleanupData: {
+        previousRelativePath: 'a38a5d82-e047-4714-855a-a39d3395899e',
+        previousProductVersion: '4.0',
+      },
+    },
+    created: '2021-04-25T13:10:06.614Z',
+    updated: '2021-04-25T13:10:06.614Z',
+    status: 'Completed',
+    reason: '',
+    isCleaned: true,
+  },
+] as unknown as IWithCleanDataIngestionParams;
 
 const urisArray = [
   '/tiffs/fakeDir1/fakeDir2',
@@ -209,4 +248,4 @@ const s3KeysArray = urisArray.map((uri) => {
   return { Key: uri };
 });
 
-export { discreteArray, urisArray, s3KeysArray };
+export { discreteArray, swapDiscreteArray, urisArray, s3KeysArray };

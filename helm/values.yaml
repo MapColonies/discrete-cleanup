@@ -35,9 +35,13 @@ rasterCommon:
         jobType: Ingestion_New
       update: 
         jobType: Ingestion_Update
+      updateSwap:
+        jobType: Ingestion_Swap_Update
     sync:
       incoming:
         JobType: "syncTarget"
+    exporter:
+      JobType: "rasterTilesExporter"
 
 authentication:
   ssl:
@@ -113,6 +117,7 @@ env:
     failedIngestionTasks: true
     successfulIngestion: true
     failedIncomingSyncTasks: true
+    successfulSwapUpdate: true
 
 resources:
   enabled: true

@@ -13,10 +13,11 @@ import {
   getSuccessNotCleanedIngestionJobsMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
   markAsCompletedMock,
+  getInProgressJobsMock,
 } from '../../mocks/clients/jobManagerClient';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { initConfig, configMock, setConfigValue } from '../../mocks/config';
-import { discreteArray } from '../../testData';
+import { discreteArray, swapDiscreteArray } from '../../testData';
 import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
 describe('CleanupCommand', function () {
@@ -78,17 +79,23 @@ describe('CleanupCommand', function () {
       const successAndNotCleaned = discreteArray.slice(2, 4);
       const failedSyncAndNotCleaned = discreteArray.slice(4);
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(successAndNotCleaned);
+      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(swapDiscreteArray);
       getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedSyncAndNotCleaned);
+      getInProgressJobsMock.mockResolvedValue([]);
       deleteLayersMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await cli.cleanup();
 
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledWith(failedAndNotCleaned);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledWith(successAndNotCleaned);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, failedAndNotCleaned, false);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, swapDiscreteArray, true);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(3);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, successAndNotCleaned, false);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, successAndNotCleaned, false);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, swapDiscreteArray, false);
     });
   });
 });

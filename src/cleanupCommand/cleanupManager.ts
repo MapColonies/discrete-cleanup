@@ -1,9 +1,9 @@
-import { IngestionParams } from '@map-colonies/mc-model-types';
+// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { inject, singleton } from 'tsyringe';
 import { JobManagerClient } from '../clients/jobManagerClient';
 import { MapproxyClient } from '../clients/mapproxyClient';
 import { SERVICES } from '../common/constants';
-import { IConfig, IJob } from '../common/interfaces';
+import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
 import { IStorageProvider } from '../storageProviders/iStorageProvider';
 
 @singleton()
@@ -11,6 +11,8 @@ export class CleanupManager {
   private readonly discreteBatchSize: number;
   private readonly newIngestionJobType: string;
   private readonly updateIngestionJobType: string;
+  private readonly swapUpdateIngestionJobType: string;
+  private readonly exporterJobType: string;
   private readonly sourceBlackList: string[];
   private readonly failedCleanupDelayDays: number;
 
@@ -24,6 +26,8 @@ export class CleanupManager {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
     this.newIngestionJobType = config.get('new_ingestion_job_type');
     this.updateIngestionJobType = config.get('update_ingestion_job_type');
+    this.swapUpdateIngestionJobType = config.get('swap_update_ingestion_job_type');
+    this.exporterJobType = config.get('export_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
   }
@@ -33,7 +37,7 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
-      await this.tileProvider.deleteDiscretes(currentBatch);
+      await this.tileProvider.deleteDiscretes(currentBatch, false);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
@@ -49,11 +53,26 @@ export class CleanupManager {
 
   public async cleanSuccessfulIngestionTasks(ingestionJobType: string): Promise<void> {
     const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
+
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
-      await this.sourcesProvider.deleteDiscretes(blackListFlitteredBatch);
+      await this.sourcesProvider.deleteDiscretes(blackListFlitteredBatch, false);
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
+    }
+  }
+
+  public async cleanSuccessfulSwappedLayersTasks(ingestionJobType: string): Promise<void> {
+    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
+    for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
+      const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
+      const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
+      const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(blackListFlitteredBatch);
+      await this.sourcesProvider.deleteDiscretes(notRunningExportFilteredBatch, false);
+      await this.tileProvider.deleteDiscretes(notRunningExportFilteredBatch, true);
+      if (notRunningExportFilteredBatch.length) {
+        await this.jobManager.markAsCompletedAndRemoveFiles(notRunningExportFilteredBatch);
+      }
     }
   }
 
@@ -67,15 +86,15 @@ export class CleanupManager {
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
       if (expiredBatch.length > 0) {
-        await this.tileProvider.deleteDiscretes(expiredBatch);
+        await this.tileProvider.deleteDiscretes(expiredBatch, false);
       }
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       await this.jobManager.markAsCompleted(completedDiscretes);
     }
   }
 
-  private filterExpiredFailedTasks(tasks: IJob<IngestionParams>[], deleteDate: Date): IJob<IngestionParams>[] {
-    const filteredTasks: IJob<IngestionParams>[] = [];
+  private filterExpiredFailedTasks(tasks: IJob<IWithCleanDataIngestionParams>[], deleteDate: Date): IJob<IWithCleanDataIngestionParams>[] {
+    const filteredTasks: IJob<IWithCleanDataIngestionParams>[] = [];
     for (let i = 0; i < tasks.length; i++) {
       const updateDate = new Date(tasks[i].updated);
       if (updateDate <= deleteDate) {
@@ -85,8 +104,8 @@ export class CleanupManager {
     return filteredTasks;
   }
 
-  private filterBlackListSourcesTasks(tasks: IJob<IngestionParams>[]): IJob<IngestionParams>[] {
-    const filteredTasks: IJob<IngestionParams>[] = [];
+  private filterBlackListSourcesTasks(tasks: IJob<IWithCleanDataIngestionParams>[]): IJob<IWithCleanDataIngestionParams>[] {
+    const filteredTasks: IJob<IWithCleanDataIngestionParams>[] = [];
     for (let i = 0; i < tasks.length; i++) {
       const originDirectory = tasks[i].parameters.originDirectory;
       if (!this.sourceBlackList.includes(originDirectory)) {
@@ -96,13 +115,29 @@ export class CleanupManager {
     return filteredTasks;
   }
 
-  private async deleteExpiredFailedTasksSources(tasks: IJob<IngestionParams>[]): Promise<IJob<IngestionParams>[]> {
+  private async filterFromRunningExportJobs(jobs: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
+    const runningExportJobs = await this.jobManager.getInProgressJobs(this.exporterJobType);
+    const cleanupReadyJobs: IJob<IWithCleanDataIngestionParams>[] = [];
+
+    for (const swapJob of jobs) {
+      const cleanupData = swapJob.parameters.cleanupData;
+      const filteredJobs = runningExportJobs.filter(
+        (job) => cleanupData?.previousProductVersion === job.version && swapJob.parameters.metadata.productId === job.resourceId
+      );
+      if (!filteredJobs.length) {
+        cleanupReadyJobs.push(swapJob);
+      }
+    }
+    return cleanupReadyJobs;
+  }
+
+  private async deleteExpiredFailedTasksSources(tasks: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
     const deleteDate = new Date();
     deleteDate.setDate(deleteDate.getDate() - this.failedCleanupDelayDays);
     const expiredBatch = this.filterExpiredFailedTasks(tasks, deleteDate);
     if (expiredBatch.length > 0) {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
-      await this.sourcesProvider.deleteDiscretes(blackListFilteredBatch);
+      await this.sourcesProvider.deleteDiscretes(blackListFilteredBatch, false);
     }
     return expiredBatch;
   }

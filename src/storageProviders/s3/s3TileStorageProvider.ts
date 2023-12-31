@@ -2,9 +2,9 @@ import { inject } from 'tsyringe';
 import { S3, Credentials } from 'aws-sdk';
 import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import { Logger } from '@map-colonies/js-logger';
-import { IngestionParams } from '@map-colonies/mc-model-types';
+// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../../common/constants';
-import { IConfig, IJob } from '../../common/interfaces';
+import { IConfig, IJob, IWithCleanDataIngestionParams } from '../../common/interfaces';
 import { IStorageProvider } from '../iStorageProvider';
 import { IS3Config } from './iS3Config';
 
@@ -41,8 +41,8 @@ export class S3TileStorageProvider implements IStorageProvider {
     this.batchSize = config.get<number>('batch_size.tilesDeletion');
   }
 
-  public async deleteDiscretes(discreteArray: IJob<IngestionParams>[]): Promise<void> {
-    const s3PreFixes = this.parseLocation(discreteArray);
+  public async deleteDiscretes(discreteArray: IJob<IWithCleanDataIngestionParams>[], isSwappedDeletion = false): Promise<void> {
+    const s3PreFixes = isSwappedDeletion ? this.parsePreviousLocation(discreteArray) : this.parseLocation(discreteArray);
     for (const s3Prefix of s3PreFixes) {
       let { itemsToDelete, continuationToken } = await this.parseItemsFromS3(s3Prefix);
       while (itemsToDelete != undefined && itemsToDelete.length !== 0) {
@@ -54,10 +54,19 @@ export class S3TileStorageProvider implements IStorageProvider {
     }
   }
 
-  private parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
+  private parseLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
     const prefixes = discreteArray.map((discrete) => {
       return [discrete.parameters.metadata.id as string, discrete.parameters.metadata.displayPath].join('/');
     });
+    return prefixes;
+  }
+
+  private parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
+    const prefixes = discreteArray
+      .filter((v) => v.parameters.cleanupData)
+      .map((discrete) => {
+        return [discrete.parameters.metadata.id, discrete.parameters.cleanupData?.previousRelativePath].join('/');
+      });
     return prefixes;
   }
 

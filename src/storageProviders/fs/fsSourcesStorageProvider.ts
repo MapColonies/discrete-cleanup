@@ -1,9 +1,9 @@
 import path from 'path';
 import { Logger } from '@map-colonies/js-logger';
-import { IngestionParams } from '@map-colonies/mc-model-types';
+// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { inject } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
-import { IConfig, IJob } from '../../common/interfaces';
+import { IConfig, IJob, IWithCleanDataIngestionParams } from '../../common/interfaces';
 import { FsStorageProviderBase } from './fsStorageProviderBase';
 
 export class FsSourcesStorageProvider extends FsStorageProviderBase {
@@ -14,10 +14,15 @@ export class FsSourcesStorageProvider extends FsStorageProviderBase {
     this.fsSourcesLocation = this.config.get<string>('fs.sources_location');
   }
 
-  protected parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
+  protected parseLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
     const directories = discreteArray.map((discrete) => {
       return path.join(this.fsSourcesLocation, discrete.parameters.originDirectory);
     });
     return directories;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
+    throw new Error('Method not implemented. this was generically implemented to support swap cleanup.');
   }
 }
