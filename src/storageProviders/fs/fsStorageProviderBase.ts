@@ -1,14 +1,13 @@
 import { promises, existsSync } from 'fs';
 import { Logger } from '@map-colonies/js-logger';
-// import { IngestionParams } from '@map-colonies/mc-model-types';
-import { IJob, IWithCleanDataIngestionParams } from '../../common/interfaces';
 import { IStorageProvider } from '../iStorageProvider';
+import { IDataLocation } from '../../common/interfaces';
 
 export abstract class FsStorageProviderBase implements IStorageProvider {
   public constructor(protected batchSize: number, protected logger: Logger) {}
 
-  public async deleteDiscretes(discreteArray: IJob<IWithCleanDataIngestionParams>[], isSwappedDeletion = false): Promise<void> {
-    const directories = isSwappedDeletion ? this.parsePreviousLocation(discreteArray) : this.parseLocation(discreteArray);
+  public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
+    const directories = this.concatDirectories(discreteLocationArray);
     let batchArray = [];
     for (let i = 0; i < directories.length; i += this.batchSize) {
       batchArray = directories.slice(i, i + this.batchSize);
@@ -20,6 +19,6 @@ export abstract class FsStorageProviderBase implements IStorageProvider {
     }
   }
 
-  protected abstract parseLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[];
-  protected abstract parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[];
+  protected abstract concatDirectories(discreteLocationArray: IDataLocation[]): string[];
+  // protected abstract parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[];
 }

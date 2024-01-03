@@ -3,7 +3,7 @@ import { inject, singleton } from 'tsyringe';
 import { JobManagerClient } from '../clients/jobManagerClient';
 import { MapproxyClient } from '../clients/mapproxyClient';
 import { SERVICES } from '../common/constants';
-import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
+import { IConfig, IJob, IWithCleanDataIngestionParams, IDataLocation, ITilesLocation } from '../common/interfaces';
 import { IStorageProvider } from '../storageProviders/iStorageProvider';
 
 @singleton()
@@ -37,7 +37,8 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
-      await this.tileProvider.deleteDiscretes(currentBatch, false);
+      const tilesDirectories = this.getCurrentTilesLocation(currentBatch)
+      await this.tileProvider.deleteDiscretes(tilesDirectories);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
@@ -57,7 +58,8 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
-      await this.sourcesProvider.deleteDiscretes(blackListFlitteredBatch, false);
+      const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
+      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
     }
   }
@@ -68,8 +70,10 @@ export class CleanupManager {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
       const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(blackListFlitteredBatch);
-      await this.sourcesProvider.deleteDiscretes(notRunningExportFilteredBatch, false);
-      await this.tileProvider.deleteDiscretes(notRunningExportFilteredBatch, true);
+      const sourcesDirectories = this.getSourcesLocation(notRunningExportFilteredBatch);
+      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+      const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch)
+      await this.tileProvider.deleteDiscretes(tilesDirectories);
       if (notRunningExportFilteredBatch.length) {
         await this.jobManager.markAsCompletedAndRemoveFiles(notRunningExportFilteredBatch);
       }
@@ -86,7 +90,8 @@ export class CleanupManager {
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
       if (expiredBatch.length > 0) {
-        await this.tileProvider.deleteDiscretes(expiredBatch, false);
+        const sourcesDirectories = this.getSourcesLocation(expiredBatch)
+        await this.tileProvider.deleteDiscretes(sourcesDirectories);
       }
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       await this.jobManager.markAsCompleted(completedDiscretes);
@@ -137,8 +142,42 @@ export class CleanupManager {
     const expiredBatch = this.filterExpiredFailedTasks(tasks, deleteDate);
     if (expiredBatch.length > 0) {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
-      await this.sourcesProvider.deleteDiscretes(blackListFilteredBatch, false);
+      const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch)
+      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
     }
     return expiredBatch;
+  }
+
+  private getSourcesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): IDataLocation[] {
+    const sourcesDirectories: IDataLocation[] = discreteArray.map((discrete) => {
+      return { directory: discrete.parameters.originDirectory };
+    });
+    return sourcesDirectories;
+  }
+
+  private getCurrentTilesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): ITilesLocation[] {
+    const tilesDirectories: ITilesLocation[] = discreteArray.map((discrete) => {
+      return {
+        directory: discrete.parameters.metadata.id as string,
+        subDirectory: discrete.parameters.metadata.displayPath as string,
+      };
+    });
+    return tilesDirectories;
+  }
+
+  private getSwappedTilesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): ITilesLocation[] {
+    const tilesDirectories: ITilesLocation[] = discreteArray
+      .filter((v) => v.parameters.cleanupData)
+      .map((discrete) => {
+        if (discrete.parameters.cleanupData && !discrete.parameters.cleanupData.previousRelativePath){
+          throw Error('Cleanup data must have previous relative path')
+        }
+        return {
+          directory: discrete.parameters.metadata.id as string,
+          subDirectory: discrete.parameters.cleanupData?.previousRelativePath as string,
+        };
+      });
+
+    return tilesDirectories;
   }
 }
