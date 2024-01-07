@@ -68,16 +68,18 @@ export class CleanupManager {
     const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
-
+      console.log(currentBatch,'batch')
       // cleaning tiles of all success jobs excluding layer that been exporting on current iteration.
       const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(currentBatch);
       const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch);
+      console.log(tilesDirectories,'*************************')
       await this.tileProvider.deleteDiscretes(tilesDirectories);
 
       // clean source data only for jobs excluded the blacklist
       const blackListFlitteredBatch =
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
+      console.log(blackListFlitteredBatch, blackListFlitteredBatch,this.sourceBlackList )
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
 
       if (notRunningExportFilteredBatch.length) {
