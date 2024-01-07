@@ -1,8 +1,13 @@
 {{- $releaseName := .Release.Name -}}
 {{- $chartName := include "discrete-cleanup.name" . -}}
+{{- $cronjobName := include "cronjob.fullname" . -}}
+{{- $configmapName := include "configmap.fullname" . }}
 {{- $cloudProviderFlavor := include "discrete-cleanup.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-cleanup.cloudProviderDockerRegistryUrl" . -}}
 {{- $imageTag := include "discrete-cleanup.tag" . -}}
+{{- $s3 := (include "common.s3.merged" .) | fromYaml }}
+{{- $fs := (include "common.fs.merged" .) | fromYaml }}
+{{- $storage := (include "common.storage.merged" .) | fromYaml }}
 {{- $cloudProviderImagePullSecretName := include "discrete-cleanup.cloudProviderImagePullSecretName" . -}}
 
 {{- if .Values.enabled -}}
@@ -15,10 +20,10 @@
 {{- end }}
 {{- end }}
 
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ $releaseName }}-cron-job
+  name: {{ $cronjobName }}
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
@@ -34,7 +39,7 @@ spec:
     spec:
       template:
         spec:
-          {{- if .Values.rasterCommon.useNodeAffinity }}
+          {{- if .Values.global.useNodeAffinity }}
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -57,16 +62,16 @@ spec:
               image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ $imageTag }}
               {{- end }}
               env:
-              {{- if eq (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
+              {{- if eq (upper $storage.tilesStorageProvider) "S3" }}
                 - name: S3_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.rasterCommon.storage.s3.secretName }}
+                      name: {{ $s3.secretName }}
                       key: accessKeyId
                 - name: S3_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.rasterCommon.storage.s3.secretName }}
+                      name: {{ $s3.secretName }}
                       key: secretAccessKey
                 {{- else }}
                 - name: FS_TILES_LOCATION
@@ -74,34 +79,34 @@ spec:
                 {{- end }}
                 - name: FS_SOURCES_LOCATION
                   value: /layerSources
-                {{- if .Values.rasterCommon.ca.secretName }}
+                {{- if .Values.global.ca.secretName }}
                 - name: REQUESTS_CA_BUNDLE
-                  value: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                  value: {{ printf "%s/%s" .Values.global.ca.path .Values.global.ca.key | quote }}
                 - name: NODE_EXTRA_CA_CERTS
-                  value: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                  value: {{ printf "%s/%s" .Values.global.ca.path .Values.global.ca.key | quote }}
                 {{- end }}
               envFrom:
                 - configMapRef:
-                    name: {{ $releaseName }}-configmap
+                    name: {{ $configmapName }}
               volumeMounts:
                {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
                 - name: sources-volume
                   mountPath: /layerSources
-                  {{- if .Values.rasterCommon.storage.fs.ingestionSourcePvc.subPath }}
-                  subPath: {{ .Values.rasterCommon.storage.fs.ingestionSourcePvc.subPath }}
+                  {{- if $fs.ingestionSourcePvc.subPath }}
+                  subPath: {{ $fs.ingestionSourcePvc.subPath }}
                   {{- end }}
                 {{- end }}
-                  {{- if ne (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
+                  {{- if ne (upper $storage.tilesStorageProvider) "S3" }}
                 - name: tiles-folder
                   mountPath: /tiles
-                  {{- if .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
-                  subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
+                  {{- if $fs.internalPvc.tilesSubPath }}
+                  subPath: {{ $fs.internalPvc.tilesSubPath }}
                   {{- end }}
                 {{- end }}
-                {{- if .Values.rasterCommon.ca.secretName }}
-                - mountPath: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+                {{- if .Values.global.ca.secretName }}
+                - mountPath: {{ printf "%s/%s" .Values.global.ca.path .Values.global.ca.key | quote }}
                   name: root-ca
-                  subPath: {{ quote .Values.rasterCommon.ca.key }}
+                  subPath: {{ quote .Values.global.ca.key }}
                 {{- end }}
                 {{- if .Values.authentication.ssl.enabled }}
                 - name: open-ssl
@@ -119,22 +124,22 @@ spec:
               emptyDir: {}
             {{- else }}
               persistentVolumeClaim:
-                claimName: {{ .Values.rasterCommon.storage.fs.ingestionSourcePvc.name }}
+                claimName: {{ $fs.ingestionSourcePvc.name }}
             {{- end }}
           {{- end }}
-            {{- if ne (upper .Values.rasterCommon.storage.tilesStorageProvider) "S3" }}
+            {{- if ne (upper $storage.tilesStorageProvider) "S3" }}
             - name: tiles-folder
               {{- if .Values.local.fs.tiles.useEmptyDir }}
               emptyDir: {}
               {{- else }}
               persistentVolumeClaim:
-                claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
+                claimName: {{ $fs.internalPvc.name }}
               {{- end }}
             {{- end }}
-            {{- if .Values.rasterCommon.ca.secretName }}
+            {{- if .Values.global.ca.secretName }}
             - name: root-ca
               secret:
-                secretName: {{ .Values.rasterCommon.ca.secretName }}
+                secretName: {{ .Values.global.ca.secretName }}
             {{- end }}
             {{- if .Values.authentication.ssl.enabled }}
             - name: open-ssl

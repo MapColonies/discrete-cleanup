@@ -1,11 +1,16 @@
 {{- $chartName := include "discrete-cleanup.name" . -}}
+{{- $configmapName := include "configmap.fullname" . }}
 {{- $tracingUrl := include "discrete-cleanup.tracingUrl" . -}}
 {{- $metricsUrl := include "discrete-cleanup.metricsUrl" . -}}
+{{- $serviceUrls := (include "common.serviceUrls.merged" .) | fromYaml }}
+{{- $storage := (include "common.storage.merged" .) | fromYaml }}
+{{- $s3 := (include "common.s3.merged" .) | fromYaml }}
+{{- $jobManagement := (include "common.jobManagement.merged" .) | fromYaml }}
 {{- if .Values.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-configmap
+  name: {{ $configmapName }}
 data:
   LOG_LEVEL: {{ .Values.env.logLevel | quote }}
   LOG_PRETTY_PRINT_ENABLED: {{ .Values.env.logPrettyPrintEnabled | quote }}
@@ -17,14 +22,14 @@ data:
   TELEMETRY_METRICS_ENABLED: 'true'
   TELEMETRY_METRICS_URL: {{ $metricsUrl }}
   {{ end }}
-  JOB_MANAGER_URL: {{ .Values.rasterCommon.serviceUrls.jobManager | quote }}
-  MAPPROXY_API_URL: {{ .Values.rasterCommon.serviceUrls.mapproxyApi | quote }}
-  TILES_STORAGE_PROVIDER: {{ .Values.rasterCommon.storage.tilesStorageProvider | quote }}
+  JOB_MANAGER_URL: {{ $serviceUrls.jobManager | quote }} 
+  MAPPROXY_API_URL: {{ $serviceUrls.mapproxyApi | quote }}
+  TILES_STORAGE_PROVIDER: {{ $storage.tilesStorageProvider | quote }}
   S3_API_VERSION: {{ .Values.env.s3.apiVersion | quote }}
-  S3_ENDPOINT: {{ .Values.rasterCommon.storage.s3.endpointUrl | quote }}
-  S3_SSL_ENABLED: {{ .Values.rasterCommon.storage.s3.sslEnabled | quote }}
+  S3_ENDPOINT: {{ $s3.endpointUrl | quote }}
+  S3_SSL_ENABLED: {{ $s3.sslEnabled | quote }}
   S3_MAX_RETRIES: {{ .Values.env.s3.maxRetries | quote }}
-  S3_BUCKET: {{ .Values.rasterCommon.storage.s3.tilesBucket | quote }}
+  S3_BUCKET: {{ $s3.tilesBucket | quote }}
   BATCH_SIZE_DISCRETE_LAYERS: {{ .Values.env.batchSize.discreteLayers | quote }}
   BATCH_SIZE_DIRECTORY_TIFF_DELETION: {{ .Values.env.batchSize.tiffDirectoryDeletion | quote }}
   BATCH_SIZE_TILES_DELETION: {{ .Values.env.batchSize.tilesDeletion | quote }}
@@ -33,11 +38,11 @@ data:
   HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts | quote }}
   HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay | quote }}
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}
-  NEW_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.new.jobType | quote }}
-  UPDATE_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.update.jobType | quote }}
-  SWAP_UPDATE_INGESTION_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.ingestion.updateSwap.jobType | quote }}
-  INCOMING_SYNC_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.sync.incoming.JobType | quote }}
-  EXPORT_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.exporter.JobType | quote }}
+  NEW_INGESTION_JOB_TYPE: {{ $jobManagement.ingestion.new.jobType | quote }}
+  UPDATE_INGESTION_JOB_TYPE: {{ $jobManagement.ingestion.update.jobType | quote }}
+  SWAP_UPDATE_INGESTION_JOB_TYPE: {{ $jobManagement.ingestion.updateSwap.jobType | quote }}
+  INCOMING_SYNC_JOB_TYPE: {{ $jobManagement.sync.incoming.JobType | quote }}
+  EXPORT_JOB_TYPE: {{ $jobManagement.exporter.JobType | quote }}
   CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
   CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: {{ .Values.env.cleanupTypes.failedIncomingSyncTasks | quote }}
