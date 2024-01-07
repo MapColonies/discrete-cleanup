@@ -11,7 +11,6 @@ export class CleanupManager {
   private readonly discreteBatchSize: number;
   private readonly newIngestionJobType: string;
   private readonly updateIngestionJobType: string;
-  private readonly swapUpdateIngestionJobType: string;
   private readonly exporterJobType: string;
   private readonly sourceBlackList: string[];
   private readonly failedCleanupDelayDays: number;
@@ -26,7 +25,6 @@ export class CleanupManager {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
     this.newIngestionJobType = config.get('new_ingestion_job_type');
     this.updateIngestionJobType = config.get('update_ingestion_job_type');
-    this.swapUpdateIngestionJobType = config.get('swap_update_ingestion_job_type');
     this.exporterJobType = config.get('export_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
@@ -68,18 +66,17 @@ export class CleanupManager {
     const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
-      console.log(currentBatch,'batch')
+      console.log(currentBatch, 'batch');
       // cleaning tiles of all success jobs excluding layer that been exporting on current iteration.
       const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(currentBatch);
       const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch);
-      console.log(tilesDirectories,'*************************')
       await this.tileProvider.deleteDiscretes(tilesDirectories);
 
       // clean source data only for jobs excluded the blacklist
       const blackListFlitteredBatch =
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
-      console.log(blackListFlitteredBatch, blackListFlitteredBatch,this.sourceBlackList )
+      console.log(blackListFlitteredBatch, blackListFlitteredBatch, this.sourceBlackList);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
 
       if (notRunningExportFilteredBatch.length) {
