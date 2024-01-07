@@ -2,9 +2,8 @@ import { inject } from 'tsyringe';
 import { S3, Credentials } from 'aws-sdk';
 import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import { Logger } from '@map-colonies/js-logger';
-// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../../common/constants';
-import { IConfig, IDataLocation, IJob, ITilesLocation, IWithCleanDataIngestionParams } from '../../common/interfaces';
+import { IConfig, IDataLocation, ITilesLocation } from '../../common/interfaces';
 import { IStorageProvider } from '../iStorageProvider';
 import { IS3Config } from './iS3Config';
 
@@ -54,27 +53,12 @@ export class S3TileStorageProvider implements IStorageProvider {
     }
   }
 
-  private concatDirectories(discreteLocationArray: IDataLocation[]): string[]{
+  private concatDirectories(discreteLocationArray: IDataLocation[]): string[] {
     const prefixes = discreteLocationArray.map((discrete) => {
       return [discrete.directory, (discrete as ITilesLocation).subDirectory].join('/');
     });
     return prefixes;
   }
-  // private parseLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
-    // const prefixes = discreteArray.map((discrete) => {
-    //   return [discrete.parameters.metadata.id as string, discrete.parameters.metadata.displayPath].join('/');
-    // });
-    // return prefixes;
-  // }
-
-  // private parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[] {
-  //   const prefixes = discreteArray
-  //     .filter((v) => v.parameters.cleanupData)
-  //     .map((discrete) => {
-  //       return [discrete.parameters.metadata.id, discrete.parameters.cleanupData?.previousRelativePath].join('/');
-  //     });
-  //   return prefixes;
-  // }
 
   private async parseItemsFromS3(prefix: string, continuationToken?: string): Promise<S3FindResponse> {
     this.logger.info(`Listing objects with prefix ${prefix} from bucket ${this.s3Config.bucket}`);

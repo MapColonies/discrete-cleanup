@@ -3,7 +3,7 @@ import path from 'path';
 import jsLogger from '@map-colonies/js-logger';
 import { FsSourcesStorageProvider } from '../../../../src/storageProviders/fs/fsSourcesStorageProvider';
 import { configMock, initConfig } from '../../../mocks/config';
-import { discreteArray, urisArray } from '../../../testData';
+import { discreteSourcesLocationsArray, urisArray } from '../../../testData';
 
 const logger = jsLogger({ enabled: false });
 let deleteDirMock: jest.SpyInstance;
@@ -27,7 +27,7 @@ describe('fsSourcesStorageProvider', () => {
   });
 
   it('Checks tiffs deletion functionality', async () => {
-    await fsSourcesStorageProvider.deleteDiscretes(discreteArray, false);
+    await fsSourcesStorageProvider.deleteDiscretes(discreteSourcesLocationsArray);
 
     expect(deleteDirMock).toHaveBeenCalledTimes(urisArray.length);
     for (const uri of urisArray) {

@@ -88,14 +88,27 @@ describe('CleanupCommand', function () {
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await cli.cleanup();
+      const expectedFailedTilesLocations = [
+        { directory: failedAndNotCleaned[0].parameters.metadata.id, subDirectory: failedAndNotCleaned[0].parameters.metadata.displayPath },
+        { directory: failedAndNotCleaned[1].parameters.metadata.id, subDirectory: failedAndNotCleaned[1].parameters.metadata.displayPath },
+      ];
+      const expectedSwappedTilesLocations = [
+        { directory: swapDiscreteArray[0].parameters.metadata.id, subDirectory: swapDiscreteArray[0].parameters.cleanupData.previousRelativePath },
+      ];
 
+      const expectedSwappedSourcesLocations = [{ directory: swapDiscreteArray[0].parameters.originDirectory }];
+
+      const expectedSucceededTilesLocations = [
+        { directory: successAndNotCleaned[0].parameters.originDirectory },
+        { directory: successAndNotCleaned[1].parameters.originDirectory },
+      ];
       expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, failedAndNotCleaned, false);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, swapDiscreteArray, true);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedFailedTilesLocations);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSwappedTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(3);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, successAndNotCleaned, false);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, successAndNotCleaned, false);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, swapDiscreteArray, false);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSucceededTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSucceededTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, expectedSwappedSourcesLocations);
     });
   });
 });

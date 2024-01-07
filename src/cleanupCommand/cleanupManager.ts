@@ -37,7 +37,7 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
-      const tilesDirectories = this.getCurrentTilesLocation(currentBatch)
+      const tilesDirectories = this.getCurrentTilesLocation(currentBatch);
       await this.tileProvider.deleteDiscretes(tilesDirectories);
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
@@ -68,12 +68,18 @@ export class CleanupManager {
     const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedIngestionJobs(ingestionJobType);
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
-      const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
-      const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(blackListFlitteredBatch);
-      const sourcesDirectories = this.getSourcesLocation(notRunningExportFilteredBatch);
-      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
-      const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch)
+
+      // cleaning tiles of all success jobs excluding layer that been exporting on current iteration.
+      const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(currentBatch);
+      const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch);
       await this.tileProvider.deleteDiscretes(tilesDirectories);
+
+      // clean source data only for jobs excluded the blacklist
+      const blackListFlitteredBatch =
+        this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
+      const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
+      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+
       if (notRunningExportFilteredBatch.length) {
         await this.jobManager.markAsCompletedAndRemoveFiles(notRunningExportFilteredBatch);
       }
@@ -90,7 +96,7 @@ export class CleanupManager {
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
       if (expiredBatch.length > 0) {
-        const sourcesDirectories = this.getSourcesLocation(expiredBatch)
+        const sourcesDirectories = this.getSourcesLocation(expiredBatch);
         await this.tileProvider.deleteDiscretes(sourcesDirectories);
       }
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
@@ -142,7 +148,7 @@ export class CleanupManager {
     const expiredBatch = this.filterExpiredFailedTasks(tasks, deleteDate);
     if (expiredBatch.length > 0) {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
-      const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch)
+      const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
     }
     return expiredBatch;
@@ -169,8 +175,8 @@ export class CleanupManager {
     const tilesDirectories: ITilesLocation[] = discreteArray
       .filter((v) => v.parameters.cleanupData)
       .map((discrete) => {
-        if (discrete.parameters.cleanupData && !discrete.parameters.cleanupData.previousRelativePath){
-          throw Error('Cleanup data must have previous relative path')
+        if (discrete.parameters.cleanupData && !discrete.parameters.cleanupData.previousRelativePath) {
+          throw Error('Cleanup data must have previous relative path');
         }
         return {
           directory: discrete.parameters.metadata.id as string,

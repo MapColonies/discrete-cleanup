@@ -2,7 +2,7 @@ import jsLogger from '@map-colonies/js-logger';
 import { S3TileStorageProvider } from '../../../../src/storageProviders/s3/s3TileStorageProvider';
 import { configMock, initConfig, setConfigValue } from '../../../mocks/config';
 import { s3Mock, initS3Mock, listObjectsV2PromiseMock, listObjectsV2Mock } from '../../../mocks/s3';
-import { discreteArray, s3KeysArray } from '../../../testData';
+import { discreteArray, s3KeysArray, discreteTilesLocationsArray } from '../../../testData';
 
 jest.mock('aws-sdk', () => {
   return {
@@ -45,8 +45,7 @@ describe('tile deletion', () => {
         NextContinuationToken: 789,
       });
     const testDiscretes = [discreteArray[0]];
-
-    await tileStorageProvider.deleteDiscretes(testDiscretes);
+    await tileStorageProvider.deleteDiscretes([discreteTilesLocationsArray[0]]);
 
     const expectedPrefix = [testDiscretes[0].parameters.metadata.id as string, testDiscretes[0].parameters.metadata.displayPath as string].join('/');
     expect(listObjectsV2Mock).toHaveBeenCalledTimes(2);

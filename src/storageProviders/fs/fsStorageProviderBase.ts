@@ -20,5 +20,4 @@ export abstract class FsStorageProviderBase implements IStorageProvider {
   }
 
   protected abstract concatDirectories(discreteLocationArray: IDataLocation[]): string[];
-  // protected abstract parsePreviousLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): string[];
 }
