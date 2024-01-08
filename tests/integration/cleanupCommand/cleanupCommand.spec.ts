@@ -10,7 +10,7 @@ import { createStorageProviderMock, IStorageProviderMock } from '../../mocks/sto
 import {
   jobManagerClientMock,
   getFailedAndNotCleanedIngestionJobsMock,
-  getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobsMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
   markAsCompletedMock,
   getInProgressJobsMock,
@@ -70,6 +70,11 @@ describe('CleanupCommand', function () {
   });
 
   describe('Happy Path', function () {
+    setConfigValue('cleanupTypes.failedIngestionTasks', true);
+    setConfigValue('cleanupTypes.successfulIngestion', true);
+    setConfigValue('cleanupTypes.failedIncomingSyncTasks', true);
+    setConfigValue('cleanupTypes.successfulSwapUpdate', true);
+
     it('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
       setConfigValue('batch_size.discreteLayers', 100);
@@ -79,9 +84,9 @@ describe('CleanupCommand', function () {
       const successAndNotCleaned = discreteArray.slice(2, 4);
       const failedSyncAndNotCleaned = discreteArray.slice(4);
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(swapDiscreteArray);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(swapDiscreteArray);
       getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedSyncAndNotCleaned);
       getInProgressJobsMock.mockResolvedValue([]);
       deleteLayersMock.mockResolvedValue([]);

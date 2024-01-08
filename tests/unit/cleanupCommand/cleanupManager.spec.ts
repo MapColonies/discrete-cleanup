@@ -1,3 +1,4 @@
+import jsLogger from '@map-colonies/js-logger';
 import { configMock, initConfig, setConfigValue } from '../../mocks/config';
 import { createStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
@@ -7,7 +8,7 @@ import {
   markAsCompletedMock,
   markAsCompletedAndRemoveFilesMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
-  getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobsMock,
   getInProgressJobsMock,
 } from '../../mocks/clients/jobManagerClient';
 import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
@@ -139,10 +140,13 @@ describe('CleanupManager', () => {
   beforeEach(() => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
+    const logger = jsLogger({ enabled: false });
+
     manager = new CleanupManager(
       tileProviderMock.providerMock,
       sourcesProviderMock.providerMock,
       configMock,
+      logger,
       mapproxyClientMock,
       jobManagerClientMock
     );
@@ -199,7 +203,7 @@ describe('CleanupManager', () => {
 
   describe('cleanSuccessfulSwappedLayersTasks', () => {
     it('succeeded swap updated jobs will delete old tiles and source files', async () => {
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(updateSwapJobs);
+      getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
       getInProgressJobsMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
@@ -216,7 +220,7 @@ describe('CleanupManager', () => {
     });
 
     it('succeeded swap updated jobs wont be delete old tiles and source files because running export', async () => {
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(updateSwapJobs);
+      getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
       getInProgressJobsMock.mockResolvedValue(inProgressExportJobs);
       markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
 

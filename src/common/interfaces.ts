@@ -32,7 +32,6 @@ export interface IDataLocation {
 export interface ITilesLocation extends IDataLocation {
   subDirectory: string;
 }
-// TODO - Temporary implementation till it will be implemented inside mc-models on IngestionParams interface.
 export interface IWithCleanDataIngestionParams extends IngestionParams {
   cleanupData?: ICleanupData;
 }

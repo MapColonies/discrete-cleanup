@@ -1,7 +1,6 @@
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
-// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../common/constants';
 import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
 

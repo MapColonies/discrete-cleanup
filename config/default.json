@@ -49,11 +49,13 @@
     "delay": "exponential",
     "shouldResetTimeout": true
   },
-  "new_ingestion_job_type": "Ingestion_New",
-  "update_ingestion_job_type": "Ingestion_Update",
-  "swap_update_ingestion_job_type": "Ingestion_Swap_Update",
-  "incoming_sync_job_type": "syncTarget",
-  "export_job_type": "rasterTilesExporter",
+  "jobTypes": {
+    "new_ingestion_job_type": "Ingestion_New",
+    "update_ingestion_job_type": "Ingestion_Update",
+    "swap_update_ingestion_job_type": "Ingestion_Swap_Update",
+    "incoming_sync_job_type": "syncTarget",
+    "export_job_type": "rasterTilesExporter"
+  },
   "cleanupTypes": {
     "failedIngestionTasks": true,
     "successfulIngestion": true,

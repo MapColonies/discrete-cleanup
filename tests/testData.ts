@@ -1,4 +1,3 @@
-// import { IngestionParams } from '@map-colonies/mc-model-types';
 import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
 
 const discreteArray = [

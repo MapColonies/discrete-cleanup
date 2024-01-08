@@ -42,6 +42,7 @@ export class S3TileStorageProvider implements IStorageProvider {
 
   public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
     const s3PreFixes = this.concatDirectories(discreteLocationArray);
+    this.logger.info({ msg: `Deleting S3 tiles objectsKeys for provided prefixes`, s3PreFixes });
     for (const s3Prefix of s3PreFixes) {
       let { itemsToDelete, continuationToken } = await this.parseItemsFromS3(s3Prefix);
       while (itemsToDelete != undefined && itemsToDelete.length !== 0) {

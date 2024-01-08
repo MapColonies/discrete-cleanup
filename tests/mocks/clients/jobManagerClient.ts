@@ -1,6 +1,6 @@
 import { JobManagerClient } from '../../../src/clients/jobManagerClient';
 
-const getSuccessNotCleanedIngestionJobsMock = jest.fn();
+const getSuccessNotCleanedJobsMock = jest.fn();
 const getFailedAndNotCleanedIngestionJobsMock = jest.fn();
 const getFailedAndNotCleanedIncomingSyncJobsMock = jest.fn();
 const getInProgressJobsMock = jest.fn();
@@ -8,7 +8,7 @@ const markAsCompletedMock = jest.fn();
 const markAsCompletedAndRemoveFilesMock = jest.fn();
 
 const jobManagerClientMock = {
-  getSuccessNotCleanedIngestionJobs: getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobs: getSuccessNotCleanedJobsMock,
   getFailedAndNotCleanedIngestionJobs: getFailedAndNotCleanedIngestionJobsMock,
   getFailedAndNotCleanedIncomingSyncJobs: getFailedAndNotCleanedIncomingSyncJobsMock,
   getInProgressJobs: getInProgressJobsMock,
@@ -18,7 +18,7 @@ const jobManagerClientMock = {
 
 export {
   jobManagerClientMock,
-  getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobsMock,
   getFailedAndNotCleanedIngestionJobsMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
   getInProgressJobsMock,
