@@ -41,7 +41,7 @@ export class CleanupManager {
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
       this.logger.info({
         msg: `Will execute cleanup to ${expiredBatch.length} failed jobs of type: '${this.newIngestionJobType}'`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndFailedNew.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndFailedNew.length / this.discreteBatchSize + 1)}`,
         jobIds: expiredBatch.map((job) => job.id),
       });
       const tilesDirectories = this.getTilesLocation(currentBatch);
@@ -61,13 +61,13 @@ export class CleanupManager {
       const currentBatch = notCleanedAndFailedUpdate.slice(i, i + this.discreteBatchSize);
       this.logger.info({
         msg: `Will execute cleanup to ${currentBatch.length} failed jobs of type: '${this.updateIngestionJobType}'`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
       });
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
       await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
       this.logger.info({
         msg: `Removed sources and complete cleanup of ${expiredBatch.length} jobs`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
         jobIds: expiredBatch.map((job) => job.id),
       });
     }
@@ -82,7 +82,7 @@ export class CleanupManager {
       const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
       this.logger.info({
         msg: `Will execute cleanup to ${blackListFlitteredBatch.length} success jobs of type: '${ingestionJobType}'`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: blackListFlitteredBatch.map((job) => job.id),
       });
       const sourcesToDelete = currentBatch.filter((discrete) => !this.sourceBlackList.includes(discrete.parameters.originDirectory));
@@ -97,7 +97,7 @@ export class CleanupManager {
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
       this.logger.info({
         msg: `Complete and mark jobs as 'Completed' with file directories remove`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: currentBatch.map((job) => job.id),
       });
     }
@@ -113,7 +113,7 @@ export class CleanupManager {
       const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(currentBatch);
       this.logger.info({
         msg: `Will execute cleanup to ${notRunningExportFilteredBatch.length} success jobs of type: '${swappJobType}'`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
       });
       this.logger.debug({ jobIds: notRunningExportFilteredBatch.map((job) => job.id) });
       const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch);
@@ -153,7 +153,7 @@ export class CleanupManager {
       const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
       this.logger.info({
         msg: `Will execute cleanup to ${currentBatch.length} failed incoming sync jobs of type: '${this.syncJobType}'`,
-        batch: `${i + 1}/ ${Math.floor(notCleanedAndFailed.length / this.discreteBatchSize + 1)}`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndFailed.length / this.discreteBatchSize + 1)}`,
       });
       this.logger.debug({ jobIds: currentBatch.map((job) => job.id) });
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
@@ -200,7 +200,10 @@ export class CleanupManager {
     for (const swapJob of jobs) {
       const cleanupData = swapJob.parameters.cleanupData;
       const filteredJobs = runningExportJobs.filter(
-        (job) => cleanupData?.previousProductVersion === job.version && swapJob.parameters.metadata.productId === job.resourceId
+        (job) =>
+          cleanupData?.previousProductVersion === job.version &&
+          swapJob.parameters.metadata.productId === job.resourceId &&
+          swapJob.parameters.metadata.id === job.internalId
       );
       if (!filteredJobs.length) {
         cleanupReadyJobs.push(swapJob);

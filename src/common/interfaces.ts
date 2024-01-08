@@ -7,6 +7,7 @@ export interface IConfig {
 }
 
 export interface IJob<T> {
+  internalId: string | undefined;
   id: string;
   resourceId: string;
   version: string;
