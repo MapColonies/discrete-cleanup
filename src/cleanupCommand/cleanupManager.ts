@@ -49,7 +49,7 @@ export class CleanupManager {
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
       this.logger.info({
-        msg: `Complete and mark jobs as 'Completed' with file directories remove`,
+        msg: `Complete and mark jobs as 'Completed' with file directories remove for all expired jobs`,
         jobIds: completedDiscretes.map((job) => job.id),
       });
       await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
@@ -66,7 +66,7 @@ export class CleanupManager {
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
       await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
       this.logger.info({
-        msg: `Removed sources and complete cleanup of ${expiredBatch.length} jobs`,
+        msg: `Removed sources and complete cleanup of ${expiredBatch.length} for all expired jobs`,
         batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
         jobIds: expiredBatch.map((job) => job.id),
       });
