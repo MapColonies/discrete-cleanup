@@ -22,6 +22,7 @@ export interface IJob<T> {
   priority: number;
   tasks?: unknown[];
 }
+
 export interface ICleanupData {
   previousRelativePath: string;
   previousProductVersion: string;
@@ -30,9 +31,11 @@ export interface ICleanupData {
 export interface IDataLocation {
   directory: string;
 }
+
 export interface ITilesLocation extends IDataLocation {
   subDirectory: string;
 }
+
 export interface IWithCleanDataIngestionParams extends IngestionParams {
   cleanupData?: ICleanupData;
 }

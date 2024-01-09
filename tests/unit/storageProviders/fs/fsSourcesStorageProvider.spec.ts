@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import path from 'path';
+import path from 'node:path';
 import jsLogger from '@map-colonies/js-logger';
 import { FsSourcesStorageProvider } from '../../../../src/storageProviders/fs/fsSourcesStorageProvider';
 import { configMock, initConfig } from '../../../mocks/config';

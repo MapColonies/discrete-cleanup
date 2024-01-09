@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { Logger } from '@map-colonies/js-logger';
 import { inject } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
