@@ -63,16 +63,16 @@ storage:
 jobManagement:
   ingestion:
     new: 
-      jobType: Ingestion_New
+      jobType: ""
     update: 
-      jobType: Ingestion_Update
+      jobType: ""
     updateSwap:
-      jobType: Ingestion_Swap_Update
+      jobType: ""
   sync:
     incoming:
-      JobType: "syncTarget"
+      JobType: ""
   exporter:
-    JobType: "rasterTilesExporter"
+    JobType: ""
 
 authentication:
   ssl:
@@ -109,7 +109,7 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   fs:
-    blacklist_sources_location:
+    blacklistSourcesLocation:
     - "test_dir"
   s3:
     maxRetries: 3
