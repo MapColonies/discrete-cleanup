@@ -7,6 +7,7 @@ export interface IConfig {
 }
 
 export interface IJob<T> {
+  internalId: string | undefined;
   id: string;
   resourceId: string;
   version: string;
@@ -29,11 +30,9 @@ export interface ICleanupData {
 export interface IDataLocation {
   directory: string;
 }
-export interface ITilesLocation extends IDataLocation{
+export interface ITilesLocation extends IDataLocation {
   subDirectory: string;
 }
-// TODO - Temporary implementation till it will be implemented inside mc-models on IngestionParams interface.
 export interface IWithCleanDataIngestionParams extends IngestionParams {
   cleanupData?: ICleanupData;
 }
-

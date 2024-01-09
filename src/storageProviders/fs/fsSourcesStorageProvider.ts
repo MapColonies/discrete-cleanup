@@ -19,9 +19,4 @@ export class FsSourcesStorageProvider extends FsStorageProviderBase {
     });
     return directories;
   }
-
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // protected parsePreviousLocation(discreteLocationArray: string[]): string[] {
-  //   throw new Error('Method not implemented. this was generically implemented to support swap cleanup.');
-  // }
 }

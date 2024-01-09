@@ -1,9 +1,9 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import path from 'path';
 import jsLogger from '@map-colonies/js-logger';
 import { FsSourcesStorageProvider } from '../../../../src/storageProviders/fs/fsSourcesStorageProvider';
 import { configMock, initConfig } from '../../../mocks/config';
-import { discreteArray, urisArray } from '../../../testData';
+import { discreteSourcesLocationsArray, urisArray } from '../../../testData';
 
 const logger = jsLogger({ enabled: false });
 let deleteDirMock: jest.SpyInstance;
@@ -14,9 +14,8 @@ let fsSourcesStorageProvider: FsSourcesStorageProvider;
 describe('fsSourcesStorageProvider', () => {
   beforeEach(() => {
     initConfig();
-    deleteDirMock = jest.spyOn(fs.promises, 'rmdir').mockResolvedValue(undefined);
+    deleteDirMock = jest.spyOn(fs.promises, 'rm').mockResolvedValue(undefined);
     jest.spyOn(path, 'join').mockImplementation((...args) => args.join('/'));
-    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
 
     fsSourcesStorageProvider = new FsSourcesStorageProvider(logger, configMock);
   });
@@ -27,11 +26,11 @@ describe('fsSourcesStorageProvider', () => {
   });
 
   it('Checks tiffs deletion functionality', async () => {
-    await fsSourcesStorageProvider.deleteDiscretes(discreteArray, false);
+    await fsSourcesStorageProvider.deleteDiscretes(discreteSourcesLocationsArray);
 
     expect(deleteDirMock).toHaveBeenCalledTimes(urisArray.length);
     for (const uri of urisArray) {
-      expect(deleteDirMock).toHaveBeenCalledWith(uri, { recursive: true });
+      expect(deleteDirMock).toHaveBeenCalledWith(uri, { recursive: true, force: true });
     }
   });
 });

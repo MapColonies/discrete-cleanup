@@ -10,7 +10,7 @@ import { createStorageProviderMock, IStorageProviderMock } from '../../mocks/sto
 import {
   jobManagerClientMock,
   getFailedAndNotCleanedIngestionJobsMock,
-  getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobsMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
   markAsCompletedMock,
   getInProgressJobsMock,
@@ -70,6 +70,11 @@ describe('CleanupCommand', function () {
   });
 
   describe('Happy Path', function () {
+    setConfigValue('cleanupTypes.failedIngestionTasks', true);
+    setConfigValue('cleanupTypes.successfulIngestion', true);
+    setConfigValue('cleanupTypes.failedIncomingSyncTasks', true);
+    setConfigValue('cleanupTypes.successfulSwapUpdate', true);
+
     it('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
       setConfigValue('batch_size.discreteLayers', 100);
@@ -79,23 +84,36 @@ describe('CleanupCommand', function () {
       const successAndNotCleaned = discreteArray.slice(2, 4);
       const failedSyncAndNotCleaned = discreteArray.slice(4);
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(successAndNotCleaned);
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValueOnce(swapDiscreteArray);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(successAndNotCleaned);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce(swapDiscreteArray);
       getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedSyncAndNotCleaned);
       getInProgressJobsMock.mockResolvedValue([]);
       deleteLayersMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await cli.cleanup();
+      const expectedFailedTilesLocations = [
+        { directory: failedAndNotCleaned[0].parameters.metadata.id, subDirectory: failedAndNotCleaned[0].parameters.metadata.displayPath },
+        { directory: failedAndNotCleaned[1].parameters.metadata.id, subDirectory: failedAndNotCleaned[1].parameters.metadata.displayPath },
+      ];
+      const expectedSwappedTilesLocations = [
+        { directory: swapDiscreteArray[0].parameters.metadata.id, subDirectory: swapDiscreteArray[0].parameters.cleanupData.previousRelativePath },
+      ];
 
+      const expectedSwappedSourcesLocations = [{ directory: swapDiscreteArray[0].parameters.originDirectory }];
+
+      const expectedSucceededTilesLocations = [
+        { directory: successAndNotCleaned[0].parameters.originDirectory },
+        { directory: successAndNotCleaned[1].parameters.originDirectory },
+      ];
       expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, failedAndNotCleaned, false);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, swapDiscreteArray, true);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedFailedTilesLocations);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSwappedTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(3);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, successAndNotCleaned, false);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, successAndNotCleaned, false);
-      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, swapDiscreteArray, false);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSucceededTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSucceededTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, expectedSwappedSourcesLocations);
     });
   });
 });

@@ -1,5 +1,4 @@
-// import { IngestionParams } from '@map-colonies/mc-model-types';
-import { IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
+import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
 
 const discreteArray = [
   {
@@ -23,9 +22,15 @@ const discreteArray = [
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
       originDirectory: 'fakeDir1/fakeDir2',
       metadata: {
+        id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
         productId: 'demo_1',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+      },
+      cleanupData: {
+        previousRelativePath: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -55,9 +60,15 @@ const discreteArray = [
       fileNames: ['tile4.png', 'tile5.png', 'tile6.png'],
       originDirectory: 'fakeDir3/fakeDir4',
       metadata: {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         productId: 'demo_2',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: '8ca6057a-e464-4682-8f11-a9754a88171e',
+      },
+      cleanupData: {
+        previousRelativePath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -87,9 +98,15 @@ const discreteArray = [
       fileNames: ['tile7.png', 'tile8.png', 'tile9.png'],
       originDirectory: 'fakeDir5/fakeDir6',
       metadata: {
+        id: 'e429f88c-3c8c-49f7-9afe-aac6fc786467',
         productId: 'demo_3',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+      },
+      cleanupData: {
+        previousRelativePath: 'e429f88c-3c8c-49f7-9afe-aac6fc786467',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -120,9 +137,15 @@ const discreteArray = [
       fileNames: ['tile10.png', 'tile11.png', 'tile12.png'],
       originDirectory: 'fakeDir7/fakeDir8',
       metadata: {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         productId: 'demo_4',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: 'edf1d872-2b8a-4556-a3d6-4bb3f198c00e',
+      },
+      cleanupData: {
+        previousRelativePath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -153,9 +176,15 @@ const discreteArray = [
       fileNames: ['tile13.png', 'tile14.png', 'tile15.png'],
       originDirectory: 'fakeDir9/fakeDir10',
       metadata: {
+        id: 'bab81024-eb0b-4362-a682-25d411f40d34',
         productId: 'demo_5',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+      },
+      cleanupData: {
+        previousRelativePath: 'bab81024-eb0b-4362-a682-25d411f40d34',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -182,9 +211,15 @@ const discreteArray = [
       fileNames: ['tile16.png', 'tile17.png', 'tile18.png'],
       originDirectory: 'fakeDir11/fakeDir12',
       metadata: {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         productId: 'demo_6',
         productVersion: 'tiles',
         productType: 'OrthophotoHistory',
+        displayPath: 'bab81024-eb0b-4362-a682-25d411f40d34',
+      },
+      cleanupData: {
+        previousRelativePath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        previousProductVersion: '4.0',
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -194,6 +229,27 @@ const discreteArray = [
     isCleaned: true,
   },
 ] as unknown as IJob<IWithCleanDataIngestionParams>[];
+
+const discreteSourcesLocationsArray = [
+  {
+    directory: discreteArray[0].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[1].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[2].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[3].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[4].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[5].parameters.originDirectory,
+  },
+] as unknown as IDataLocation[];
 
 const swapDiscreteArray = [
   {
@@ -217,6 +273,7 @@ const swapDiscreteArray = [
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
       originDirectory: 'fakeDir1/fakeDir2',
       metadata: {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         productId: 'demo_1',
         productVersion: '5.0',
         productType: 'OrthophotoHistory',
@@ -232,7 +289,34 @@ const swapDiscreteArray = [
     reason: '',
     isCleaned: true,
   },
-] as unknown as IWithCleanDataIngestionParams;
+];
+
+const discreteTilesLocationsArray = [
+  {
+    directory: discreteArray[0].parameters.metadata.id,
+    subDirectory: discreteArray[0].parameters.metadata.displayPath,
+  },
+  {
+    directory: discreteArray[1].parameters.metadata.id,
+    subDirectory: discreteArray[1].parameters.metadata.displayPath,
+  },
+  {
+    directory: discreteArray[2].parameters.metadata.id,
+    subDirectory: discreteArray[2].parameters.metadata.displayPath,
+  },
+  {
+    directory: discreteArray[3].parameters.metadata.id,
+    subDirectory: discreteArray[3].parameters.metadata.displayPath,
+  },
+  {
+    directory: discreteArray[4].parameters.metadata.id,
+    subDirectory: discreteArray[4].parameters.metadata.displayPath,
+  },
+  {
+    directory: discreteArray[5].parameters.metadata.id,
+    subDirectory: discreteArray[5].parameters.metadata.displayPath,
+  },
+] as unknown as IDataLocation[];
 
 const urisArray = [
   '/tiffs/fakeDir1/fakeDir2',
@@ -248,4 +332,4 @@ const s3KeysArray = urisArray.map((uri) => {
   return { Key: uri };
 });
 
-export { discreteArray, swapDiscreteArray, urisArray, s3KeysArray };
+export { discreteArray, discreteSourcesLocationsArray, discreteTilesLocationsArray, swapDiscreteArray, urisArray, s3KeysArray };

@@ -30,7 +30,10 @@
   "fs": {
     "tiles_location": "FS_TILES_LOCATION",
     "sources_location": "FS_SOURCES_LOCATION",
-    "blacklist_sources_location": "FS_BLACK_LIST_SOURCES_LOCATION"
+    "blacklist_sources_location": {
+      "__name": "FS_BLACK_LIST_SOURCES_LOCATION",
+      "__format": "json"
+    }
   },
   "s3": {
     "apiVersion": "S3_API_VERSION",
@@ -82,11 +85,13 @@
       "__format": "boolean"
     }
   },
-  "new_ingestion_job_type": "NEW_INGESTION_JOB_TYPE",
-  "update_ingestion_job_type": "UPDATE_INGESTION_JOB_TYPE",
-  "swap_update_ingestion_job_type": "SWAP_UPDATE_INGESTION_JOB_TYPE",
-  "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE",
-  "export_job_type": "EXPORT_JOB_TYPE",
+  "jobTypes": {
+    "new_ingestion_job_type": "NEW_INGESTION_JOB_TYPE",
+    "update_ingestion_job_type": "UPDATE_INGESTION_JOB_TYPE",
+    "swap_update_ingestion_job_type": "SWAP_UPDATE_INGESTION_JOB_TYPE",
+    "incoming_sync_job_type": "INCOMING_SYNC_JOB_TYPE",
+    "export_job_type": "EXPORT_JOB_TYPE"
+  },
   "cleanupTypes": {
     "failedIngestionTasks": {
       "__name": "CLEANUP_TYPES_FAILED_INGESTION_TASKS",

@@ -1,3 +1,4 @@
+import jsLogger from '@map-colonies/js-logger';
 import { configMock, initConfig, setConfigValue } from '../../mocks/config';
 import { createStorageProviderMock } from '../../mocks/storageProviders/providerMockGenerator';
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
@@ -7,7 +8,7 @@ import {
   markAsCompletedMock,
   markAsCompletedAndRemoveFilesMock,
   getFailedAndNotCleanedIncomingSyncJobsMock,
-  getSuccessNotCleanedIngestionJobsMock,
+  getSuccessNotCleanedJobsMock,
   getInProgressJobsMock,
 } from '../../mocks/clients/jobManagerClient';
 import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
@@ -22,6 +23,10 @@ const failedJobs = [
     parameters: {
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
       originDirectory: 'fakeDir1/fakeDir2',
+      metadata: {
+        id: '8ca6057a-e464-4682-8f11-a9754a88171e',
+        displayPath: '2c8d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4sed',
+      },
     },
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
@@ -38,6 +43,10 @@ const failedJobs = [
     parameters: {
       fileNames: ['tile4.png', 'tile5.png', 'tile6.png'],
       originDirectory: 'fakeDir3/fakeDir4',
+      metadata: {
+        id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+        displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
+      },
     },
     created: '2021-04-11T13:11:06.614Z',
     updated: '2021-04-11T13:11:06.614Z',
@@ -54,6 +63,10 @@ const failedJobs = [
     parameters: {
       fileNames: ['tile7.png', 'tile8.png', 'tile9.png'],
       originDirectory: 'fakeDir5/fakeDir6',
+      metadata: {
+        id: '2c8d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4sed',
+        displayPath: '1r6d6bcd-bbfd-4b2d-9b5d-ab8dfbbd1rfd',
+      },
     },
     created: '2021-04-11T12:10:06.614Z',
     updated: '2021-04-11T12:10:06.614Z',
@@ -66,13 +79,15 @@ const failedJobs = [
 const updateSwapJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
-    displayPath: '2c8d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4sed',
+    displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
     resourceId: 'demo_1',
     version: '5.0',
     tasks: [],
     parameters: {
       metadata: {
         productId: 'demo_1',
+        id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+        displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
       },
       fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
       originDirectory: 'fakeDir1/fakeDir2',
@@ -125,10 +140,13 @@ describe('CleanupManager', () => {
   beforeEach(() => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
+    const logger = jsLogger({ enabled: false });
+
     manager = new CleanupManager(
       tileProviderMock.providerMock,
       sourcesProviderMock.providerMock,
       configMock,
+      logger,
       mapproxyClientMock,
       jobManagerClientMock
     );
@@ -152,8 +170,15 @@ describe('CleanupManager', () => {
       await manager.cleanFailedIngestionTasks();
 
       const expiredJobs = [failedJobs[2]];
-      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs, false);
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(failedJobs, false);
+      const expectedSourceDirectories = [{ directory: expiredJobs[0].parameters.originDirectory }];
+      const expectedTilesDirectories = [
+        { directory: failedJobs[0].parameters.metadata.id, subDirectory: failedJobs[0].parameters.metadata.displayPath },
+        { directory: failedJobs[1].parameters.metadata.id, subDirectory: failedJobs[1].parameters.metadata.displayPath },
+        { directory: failedJobs[2].parameters.metadata.id, subDirectory: failedJobs[2].parameters.metadata.displayPath },
+      ];
+
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
     });
@@ -168,7 +193,9 @@ describe('CleanupManager', () => {
       await manager.cleanFailedIncomingSyncTasks();
 
       const expiredJobs = [failedJobs[2]];
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expiredJobs, false);
+      const expectedSourceDirectories = [{ directory: expiredJobs[0].parameters.originDirectory }];
+
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
       expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
     });
@@ -176,27 +203,31 @@ describe('CleanupManager', () => {
 
   describe('cleanSuccessfulSwappedLayersTasks', () => {
     it('succeeded swap updated jobs will delete old tiles and source files', async () => {
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(updateSwapJobs);
+      getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
       getInProgressJobsMock.mockResolvedValue([]);
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await manager.cleanSuccessfulSwappedLayersTasks('update_swap');
+      const expectTilesDirectories = [
+        { directory: updateSwapJobs[0].parameters.metadata.id, subDirectory: updateSwapJobs[0].parameters.cleanupData.previousRelativePath },
+      ];
 
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(updateSwapJobs, true);
-      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(updateSwapJobs, false);
+      const expectSourceDirectories = [{ directory: updateSwapJobs[0].parameters.originDirectory }];
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectTilesDirectories);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectSourceDirectories);
 
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(updateSwapJobs);
     });
 
     it('succeeded swap updated jobs wont be delete old tiles and source files because running export', async () => {
-      getSuccessNotCleanedIngestionJobsMock.mockResolvedValue(updateSwapJobs);
+      getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
       getInProgressJobsMock.mockResolvedValue(inProgressExportJobs);
       markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
 
       await manager.cleanSuccessfulSwappedLayersTasks('update_swap');
 
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([], true);
-      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([], false);
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledTimes(0);
     });
   });
