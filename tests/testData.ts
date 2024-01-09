@@ -1,4 +1,4 @@
-import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
+import { IDataLocation, IJob, ITilesLocation, IWithCleanDataIngestionParams } from '../src/common/interfaces';
 
 const discreteArray = [
   {
@@ -251,6 +251,33 @@ const discreteSourcesLocationsArray = [
   },
 ] as unknown as IDataLocation[];
 
+const discreteTilesArray = [
+  {
+    directory: 'uuid1',
+    subDirectory: 'uuid11',
+  },
+  {
+    directory: 'uuid2',
+    subDirectory: 'uuid22',
+  },
+  {
+    directory: 'uuid3',
+    subDirectory: 'uuid33',
+  },
+  {
+    directory: 'uuid4',
+    subDirectory: 'uuid44',
+  },
+  {
+    directory: 'uuid5',
+    subDirectory: 'uuid55',
+  },
+  {
+    directory: 'uuid6',
+    subDirectory: 'uuid66',
+  },
+] as unknown as ITilesLocation[];
+
 const swapDiscreteArray = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
@@ -327,9 +354,27 @@ const urisArray = [
   '/tiffs/fakeDir11/fakeDir12',
 ];
 
+const urisFsArray = [
+  '/tiffs/uuid1/uuid11',
+  '/tiffs/uuid2/uuid22',
+  '/tiffs/uuid3/uuid33',
+  '/tiffs/uuid4/uuid44',
+  '/tiffs/uuid5/uuid55',
+  '/tiffs/uuid6/uuid66',
+];
+
 const s3KeysArray = urisArray.map((uri) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   return { Key: uri };
 });
 
-export { discreteArray, discreteSourcesLocationsArray, discreteTilesLocationsArray, swapDiscreteArray, urisArray, s3KeysArray };
+export {
+  discreteArray,
+  discreteSourcesLocationsArray,
+  discreteTilesLocationsArray,
+  discreteTilesArray,
+  swapDiscreteArray,
+  urisArray,
+  urisFsArray,
+  s3KeysArray,
+};
