@@ -122,6 +122,7 @@ const inProgressExportJobs = [
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'In-Progress',
+    internalId: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
     reason: '',
     isCleaned: false,
   },
