@@ -355,12 +355,12 @@ const urisArray = [
 ];
 
 const urisFsArray = [
-  '/tiffs/uuid1/uuid11',
-  '/tiffs/uuid2/uuid22',
-  '/tiffs/uuid3/uuid33',
-  '/tiffs/uuid4/uuid44',
-  '/tiffs/uuid5/uuid55',
-  '/tiffs/uuid6/uuid66',
+  '/tiles/uuid1/uuid11',
+  '/tiles/uuid2/uuid22',
+  '/tiles/uuid3/uuid33',
+  '/tiles/uuid4/uuid44',
+  '/tiles/uuid5/uuid55',
+  '/tiles/uuid6/uuid66',
 ];
 
 const s3KeysArray = urisArray.map((uri) => {

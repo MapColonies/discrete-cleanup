@@ -29,10 +29,12 @@ describe('providersManager', () => {
 
   it('Checks getting FS tiles location providers', () => {
     setConfigValue('tiles_storage_provider', 'FS');
+    setConfigValue('fs.tiles_location', '/tiles');
+
     const res = getProviders(configMock, logger);
 
     expect(pushMock).toHaveBeenCalledTimes(1);
-    expect((res[1].provider as unknown as { useValue: Record<string, unknown> }).useValue.fsTilesLocation).toBe('/tiffs');
+    expect((res[1].provider as unknown as { useValue: Record<string, unknown> }).useValue.fsTilesLocation).toBe('/tiles');
     expect((res[1].provider as unknown as { useValue: Record<string, unknown> }).useValue.s3Config === undefined).toBe(true);
   });
 

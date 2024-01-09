@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import jsLogger from '@map-colonies/js-logger';
 import { FsTileStorageProvider } from '../../../../src/storageProviders/fs/fsTileStorageProvider';
-import { configMock, initConfig } from '../../../mocks/config';
+import { configMock, initConfig, setConfigValue } from '../../../mocks/config';
 import { discreteTilesArray, urisFsArray } from '../../../testData';
 
 const logger = jsLogger({ enabled: false });
@@ -14,6 +14,8 @@ let fsTileStorageProvider: FsTileStorageProvider;
 describe('fsSourcesStorageProvider', () => {
   beforeEach(() => {
     initConfig();
+    setConfigValue('fs.tiles_location', '/tiles');
+
     deleteDirMock = jest.spyOn(fs.promises, 'rm').mockResolvedValue(undefined);
     jest.spyOn(path, 'join').mockImplementation((...args) => args.join('/'));
 
@@ -27,7 +29,6 @@ describe('fsSourcesStorageProvider', () => {
 
   it('Checks tiles deletion functionality', async () => {
     await fsTileStorageProvider.deleteDiscretes(discreteTilesArray);
-
     expect(deleteDirMock).toHaveBeenCalledTimes(urisFsArray.length);
     for (const uri of urisFsArray) {
       expect(deleteDirMock).toHaveBeenCalledWith(uri, { recursive: true, force: true });
