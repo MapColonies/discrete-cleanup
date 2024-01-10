@@ -33,7 +33,6 @@ export class CleanupManager {
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
     this.failedSyncCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.sync');
-
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
