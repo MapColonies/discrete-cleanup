@@ -76,6 +76,30 @@ const failedJobs = [
   },
 ];
 
+const ingestionNewJobs = [
+  {
+    id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+    displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
+    resourceId: 'new_layer',
+    version: '5.0',
+    tasks: [],
+    parameters: {
+      metadata: {
+        productId: 'new_layer',
+        id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+        displayPath: '3r3d6bcd-bbfd-4b2d-9b5d-ab8dfbbd5ttt',
+      },
+      fileNames: ['tile1.jpeg', 'tile2.jpeg', 'tile3.jpeg'],
+      originDirectory: 'some_black_directory',
+    },
+    created: '2021-04-25T13:10:06.614Z',
+    updated: '2021-04-25T13:10:06.614Z',
+    status: 'Completed',
+    reason: '',
+    isCleaned: false,
+  },
+];
+
 const updateSwapJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
@@ -141,6 +165,7 @@ describe('CleanupManager', () => {
   beforeEach(() => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
+    setConfigValue('fs.blacklist_sources_location', 'some_black_directory');
     const logger = jsLogger({ enabled: false });
 
     manager = new CleanupManager(
@@ -182,6 +207,32 @@ describe('CleanupManager', () => {
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
+    });
+  });
+
+  describe('cleanSuccessIncomingIngestionTasks', () => {
+    it('expired success jobs Ingestion_New', async () => {
+      getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
+      markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
+      await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
+
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([{ directory: updateSwapJobs[0].parameters.originDirectory }]);
+      expect(deleteLayersMock).toHaveBeenCalledTimes(0);
+      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(updateSwapJobs);
+    });
+
+    it('expired success jobs Ingestion_New without source deletion', async () => {
+      getSuccessNotCleanedJobsMock.mockResolvedValue(ingestionNewJobs);
+      markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
+      await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
+
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
+      expect(deleteLayersMock).toHaveBeenCalledTimes(0);
+      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(ingestionNewJobs);
     });
   });
 
