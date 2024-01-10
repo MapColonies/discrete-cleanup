@@ -15,6 +15,7 @@ export class CleanupManager {
   private readonly syncJobType: string;
   private readonly sourceBlackList: string[];
   private readonly failedCleanupDelayDays: number;
+  private readonly failedSyncCleanupDelayDays: number;
 
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
@@ -31,6 +32,8 @@ export class CleanupManager {
     this.syncJobType = config.get('jobTypes.incoming_sync_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
+    this.failedSyncCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.sync');
+
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
@@ -144,9 +147,8 @@ export class CleanupManager {
   }
 
   public async cleanFailedIncomingSyncTasks(): Promise<void> {
-    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.sync');
     const deleteDate = new Date();
-    deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
+    deleteDate.setDate(deleteDate.getDate() - this.failedSyncCleanupDelayDays);
     this.logger.info({ msg: `Running Cleanup for failed incoming sync jobs of type: ${this.syncJobType}` });
     const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIncomingSyncJobs();
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
