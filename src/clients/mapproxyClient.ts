@@ -1,9 +1,8 @@
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
-import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../common/constants';
-import { IConfig, IJob } from '../common/interfaces';
+import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
 
 @singleton()
 export class MapproxyClient extends HttpClient {
@@ -11,7 +10,7 @@ export class MapproxyClient extends HttpClient {
     super(logger, config.get<string>('mapproxy_api.url'), 'mapproxy-api', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
-  public async deleteLayers(discreteLayers: IJob<IngestionParams>[]): Promise<IJob<IngestionParams>[]> {
+  public async deleteLayers(discreteLayers: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
     const mapProxyLayersToDelete: string[] = [];
 
     for (const discrete of discreteLayers) {

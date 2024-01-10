@@ -10,3 +10,8 @@ export enum StorageProviderType {
   S3 = 'S3',
   FS = 'FS',
 }
+
+export enum LocationType {
+  TILES = 'TILES',
+  SOURCES = 'SOURCES',
+}

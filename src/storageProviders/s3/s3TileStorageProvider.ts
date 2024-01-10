@@ -2,9 +2,8 @@ import { inject } from 'tsyringe';
 import { S3, Credentials } from 'aws-sdk';
 import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import { Logger } from '@map-colonies/js-logger';
-import { IngestionParams } from '@map-colonies/mc-model-types';
 import { SERVICES } from '../../common/constants';
-import { IConfig, IJob } from '../../common/interfaces';
+import { IConfig, IDataLocation, ITilesLocation } from '../../common/interfaces';
 import { IStorageProvider } from '../iStorageProvider';
 import { IS3Config } from './iS3Config';
 
@@ -41,8 +40,9 @@ export class S3TileStorageProvider implements IStorageProvider {
     this.batchSize = config.get<number>('batch_size.tilesDeletion');
   }
 
-  public async deleteDiscretes(discreteArray: IJob<IngestionParams>[]): Promise<void> {
-    const s3PreFixes = this.parseLocation(discreteArray);
+  public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
+    const s3PreFixes = this.concatDirectories(discreteLocationArray);
+    this.logger.info({ msg: `Deleting S3 tiles objectsKeys for provided prefixes`, s3PreFixes });
     for (const s3Prefix of s3PreFixes) {
       let { itemsToDelete, continuationToken } = await this.parseItemsFromS3(s3Prefix);
       while (itemsToDelete != undefined && itemsToDelete.length !== 0) {
@@ -54,9 +54,9 @@ export class S3TileStorageProvider implements IStorageProvider {
     }
   }
 
-  private parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
-    const prefixes = discreteArray.map((discrete) => {
-      return [discrete.parameters.metadata.id as string, discrete.parameters.metadata.displayPath].join('/');
+  private concatDirectories(discreteLocationArray: IDataLocation[]): string[] {
+    const prefixes = discreteLocationArray.map((discrete) => {
+      return [discrete.directory, (discrete as ITilesLocation).subDirectory].join('/');
     });
     return prefixes;
   }

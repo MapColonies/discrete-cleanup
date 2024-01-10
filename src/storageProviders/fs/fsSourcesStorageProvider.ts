@@ -1,9 +1,8 @@
-import path from 'path';
+import path from 'node:path';
 import { Logger } from '@map-colonies/js-logger';
-import { IngestionParams } from '@map-colonies/mc-model-types';
 import { inject } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
-import { IConfig, IJob } from '../../common/interfaces';
+import { IConfig, IDataLocation } from '../../common/interfaces';
 import { FsStorageProviderBase } from './fsStorageProviderBase';
 
 export class FsSourcesStorageProvider extends FsStorageProviderBase {
@@ -14,9 +13,9 @@ export class FsSourcesStorageProvider extends FsStorageProviderBase {
     this.fsSourcesLocation = this.config.get<string>('fs.sources_location');
   }
 
-  protected parseLocation(discreteArray: IJob<IngestionParams>[]): string[] {
-    const directories = discreteArray.map((discrete) => {
-      return path.join(this.fsSourcesLocation, discrete.parameters.originDirectory);
+  protected concatDirectories(discreteLocationArray: IDataLocation[]): string[] {
+    const directories = discreteLocationArray.map((discrete) => {
+      return path.join(this.fsSourcesLocation, discrete.directory);
     });
     return directories;
   }

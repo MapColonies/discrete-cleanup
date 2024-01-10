@@ -35,9 +35,13 @@ rasterCommon:
         jobType: Ingestion_New
       update: 
         jobType: Ingestion_Update
+      updateSwap:
+        jobType: Ingestion_Swap_Update
     sync:
       incoming:
         JobType: "syncTarget"
+    exporter:
+      JobType: "rasterTilesExporter"
 
 authentication:
   ssl:
@@ -94,7 +98,8 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   fs:
-    blacklist_sources_location: ["test_dir"]
+    blacklist_sources_location:
+    - "test_dir"
   s3:
     maxRetries: 3
     apiVersion: 2006-03-01
@@ -113,6 +118,7 @@ env:
     failedIngestionTasks: true
     successfulIngestion: true
     failedIncomingSyncTasks: true
+    successfulSwapUpdate: true
 
 resources:
   enabled: true

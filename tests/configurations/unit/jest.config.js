@@ -1,11 +1,6 @@
 module.exports = {
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.test.json',
-    },
+    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
   testMatch: ['<rootDir>/tests/unit/**/*.spec.ts'],
   coverageReporters: ['text', 'html'],
@@ -15,6 +10,7 @@ module.exports = {
     '!*/node_modules/',
     '!/vendor/**',
     '!*/common/**',
+    '!**/clients/**',
     '!**/controllers/**',
     '!**/routes/**',
     '!<rootDir>/src/*',
@@ -30,10 +26,10 @@ module.exports = {
   testEnvironment: 'node',
   coverageThreshold: {
     global: {
-      branches: 58,
-      functions: 60,
-      lines: 62,
-      statements: 65,
+      branches: 82,
+      functions: 98,
+      lines: 99,
+      statements: 99,
     },
   },
 };
