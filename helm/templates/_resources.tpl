@@ -1,11 +1,4 @@
 {{/*
-Create service name as used by the service name label.
-*/}}
-{{- define "service.fullname" -}}
-{{- printf "%s-%s-%s" .Release.Name .Chart.Name "service" | indent 1 }}
-{{- end }}
-
-{{/*
 Create configmap name as used by the service name label.
 */}}
 {{- define "configmap.fullname" -}}
@@ -17,18 +10,4 @@ Create deployment name as used by the service name label.
 */}}
 {{- define "cronjob.fullname" -}}
 {{- printf "%s-%s-%s" .Release.Name .Chart.Name "cron-job" | indent 1 }}
-{{- end }}
-
-{{/*
-Create route name as used by the service name label.
-*/}}
-{{- define "route.fullname" -}}
-{{- printf "%s-%s-%s" .Release.Name .Chart.Name "route" | indent 1 }}
-{{- end }}
-
-{{/*
-Create ingress name as used by the service name label.
-*/}}
-{{- define "ingress.fullname" -}}
-{{- printf "%s-%s-%s" .Release.Name .Chart.Name "ingress" | indent 1 }}
 {{- end }}

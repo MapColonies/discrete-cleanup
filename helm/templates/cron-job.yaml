@@ -94,7 +94,7 @@ spec:
                 - configMapRef:
                     name: {{ $configmapName }}
               volumeMounts:
-               {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
+               {{- if or (.Values.env.cleanupTypes.failedIngestionTasks) (.Values.env.cleanupTypes.successfulIngestion) (.Values.env.cleanupTypes.successfulSwapUpdate) }}
                 - name: sources-volume
                   mountPath: /layerSources
                   {{- if $fs.ingestionSourcePvc.subPath }}
