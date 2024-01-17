@@ -32,7 +32,6 @@ global:
       new: 
         jobType: ""
       update: 
-<<<<<<< HEAD
         jobType: ""
       updateSwap:
         jobType: ""
@@ -74,16 +73,6 @@ jobManagement:
       JobType: ""
   exporter:
     JobType: ""
-=======
-        jobType: Ingestion_Update
-      updateSwap:
-        jobType: Ingestion_Swap_Update
-    sync:
-      incoming:
-        JobType: "syncTarget"
-    exporter:
-      JobType: "rasterTilesExporter"
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 
 authentication:
   ssl:
@@ -127,11 +116,7 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   fs:
-<<<<<<< HEAD
     blacklistSourcesLocation:
-=======
-    blacklist_sources_location:
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
     - "test_dir"
   s3:
     maxRetries: 3

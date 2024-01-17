@@ -76,8 +76,6 @@ const failedJobs = [
   },
 ];
 
-<<<<<<< HEAD
-=======
 const ingestionNewJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
@@ -102,7 +100,6 @@ const ingestionNewJobs = [
   },
 ];
 
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 const updateSwapJobs = [
   {
     id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
@@ -149,10 +146,7 @@ const inProgressExportJobs = [
     created: '2021-04-25T13:10:06.614Z',
     updated: '2021-04-25T13:10:06.614Z',
     status: 'In-Progress',
-<<<<<<< HEAD
-=======
     internalId: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
     reason: '',
     isCleaned: false,
   },
@@ -171,10 +165,7 @@ describe('CleanupManager', () => {
   beforeEach(() => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
-<<<<<<< HEAD
-=======
     setConfigValue('fs.blacklist_sources_location', 'some_black_directory');
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
     const logger = jsLogger({ enabled: false });
 
     manager = new CleanupManager(
