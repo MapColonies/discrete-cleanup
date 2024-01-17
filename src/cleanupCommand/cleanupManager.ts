@@ -15,6 +15,7 @@ export class CleanupManager {
   private readonly syncJobType: string;
   private readonly sourceBlackList: string[];
   private readonly failedCleanupDelayDays: number;
+  private readonly failedSyncCleanupDelayDays: number;
 
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
@@ -31,6 +32,7 @@ export class CleanupManager {
     this.syncJobType = config.get('jobTypes.incoming_sync_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
+    this.failedSyncCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.sync');
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
@@ -64,6 +66,11 @@ export class CleanupManager {
         batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
       });
       const expiredBatch = await this.deleteExpiredFailedTasksSources(currentBatch);
+      this.logger.info({
+        msg: `Complete and mark jobs as 'Completed' ${expiredBatch.length} for all expired jobs`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
+        jobIds: expiredBatch.map((job) => job.id),
+      });
       await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
       this.logger.info({
         msg: `Removed sources and complete cleanup of ${expiredBatch.length} for all expired jobs`,
@@ -79,11 +86,19 @@ export class CleanupManager {
 
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
+<<<<<<< HEAD
       const blackListFlitteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
       this.logger.info({
         msg: `Will execute cleanup to ${blackListFlitteredBatch.length} success jobs of type: '${ingestionJobType}'`,
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: blackListFlitteredBatch.map((job) => job.id),
+=======
+      const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
+      this.logger.info({
+        msg: `Will execute cleanup to ${blackListFilteredBatch.length} success jobs of type: '${ingestionJobType}'`,
+        batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
+        jobIds: blackListFilteredBatch.map((job) => job.id),
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       });
       const sourcesToDelete = currentBatch.filter((discrete) => !this.sourceBlackList.includes(discrete.parameters.originDirectory));
       const ignoredSources = currentBatch.filter((discrete) => this.sourceBlackList.includes(discrete.parameters.originDirectory));
@@ -92,7 +107,11 @@ export class CleanupManager {
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
         ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.originDirectory) : [],
       });
+<<<<<<< HEAD
       const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
+=======
+      const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
       this.logger.info({
@@ -114,15 +133,26 @@ export class CleanupManager {
       this.logger.info({
         msg: `Will execute cleanup to ${notRunningExportFilteredBatch.length} success jobs of type: '${swappJobType}'`,
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
+<<<<<<< HEAD
       });
       this.logger.debug({ jobIds: notRunningExportFilteredBatch.map((job) => job.id) });
+=======
+        jobIds: notRunningExportFilteredBatch.map((job) => job.id),
+      });
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       const tilesDirectories = this.getSwappedTilesLocation(notRunningExportFilteredBatch);
       await this.tileProvider.deleteDiscretes(tilesDirectories);
 
       // clean source data only for jobs excluded the blacklist
+<<<<<<< HEAD
       const blackListFlitteredBatch =
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFlitteredBatch);
+=======
+      const blackListFilteredBatch =
+        this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
+      const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 
       const sourcesToDelete = notRunningExportFilteredBatch.filter((discrete) => !this.sourceBlackList.includes(discrete.parameters.originDirectory));
       const ignoredSources = notRunningExportFilteredBatch.filter((discrete) => this.sourceBlackList.includes(discrete.parameters.originDirectory));
@@ -144,9 +174,12 @@ export class CleanupManager {
   }
 
   public async cleanFailedIncomingSyncTasks(): Promise<void> {
-    const FAILED_CLEANUP_DELAY = this.config.get<number>('failed_cleanup_delay_days.sync');
     const deleteDate = new Date();
+<<<<<<< HEAD
     deleteDate.setDate(deleteDate.getDate() - FAILED_CLEANUP_DELAY);
+=======
+    deleteDate.setDate(deleteDate.getDate() - this.failedSyncCleanupDelayDays);
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
     this.logger.info({ msg: `Running Cleanup for failed incoming sync jobs of type: ${this.syncJobType}` });
     const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIncomingSyncJobs();
     for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
@@ -154,8 +187,13 @@ export class CleanupManager {
       this.logger.info({
         msg: `Will execute cleanup to ${currentBatch.length} failed incoming sync jobs of type: '${this.syncJobType}'`,
         batch: `${i + 1}/${Math.floor(notCleanedAndFailed.length / this.discreteBatchSize + 1)}`,
+<<<<<<< HEAD
       });
       this.logger.debug({ jobIds: currentBatch.map((job) => job.id) });
+=======
+        jobIds: currentBatch.map((job) => job.id),
+      });
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
       const expiredBatch = this.filterExpiredFailedTasks(currentBatch, deleteDate);
       if (expiredBatch.length > 0) {
@@ -220,6 +258,14 @@ export class CleanupManager {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+<<<<<<< HEAD
+=======
+      this.logger.info({
+        msg: `Removed sources for expired and non blacklist filtered jobs'`,
+        jobIds: blackListFilteredBatch.map((job) => job.id),
+        totalExpiredJobs: expiredBatch.map((job) => job.id),
+      });
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
     }
     return expiredBatch;
   }
@@ -243,7 +289,11 @@ export class CleanupManager {
 
   private getSwappedTilesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): ITilesLocation[] {
     const tilesDirectories: ITilesLocation[] = discreteArray
+<<<<<<< HEAD
       .filter((v) => v.parameters.cleanupData)
+=======
+      .filter((nonFilteredDiscrete) => nonFilteredDiscrete.parameters.cleanupData)
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       .map((discrete) => {
         if (discrete.parameters.cleanupData && !discrete.parameters.cleanupData.previousRelativePath) {
           throw Error('Cleanup data must have previous relative path');

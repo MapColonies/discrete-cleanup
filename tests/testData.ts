@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../src/common/interfaces';
+=======
+import { IDataLocation, IJob, ITilesLocation, IWithCleanDataIngestionParams } from '../src/common/interfaces';
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 
 const discreteArray = [
   {
@@ -220,6 +224,7 @@ const discreteArray = [
       cleanupData: {
         previousRelativePath: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
         previousProductVersion: '4.0',
+<<<<<<< HEAD
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -281,6 +286,8 @@ const swapDiscreteArray = [
       cleanupData: {
         previousRelativePath: 'a38a5d82-e047-4714-855a-a39d3395899e',
         previousProductVersion: '4.0',
+=======
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
       },
     },
     created: '2021-04-25T13:10:06.614Z',
@@ -289,6 +296,97 @@ const swapDiscreteArray = [
     reason: '',
     isCleaned: true,
   },
+<<<<<<< HEAD
+=======
+] as unknown as IJob<IWithCleanDataIngestionParams>[];
+
+const discreteSourcesLocationsArray = [
+  {
+    directory: discreteArray[0].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[1].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[2].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[3].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[4].parameters.originDirectory,
+  },
+  {
+    directory: discreteArray[5].parameters.originDirectory,
+  },
+] as unknown as IDataLocation[];
+
+const discreteTilesArray = [
+  {
+    directory: 'uuid1',
+    subDirectory: 'uuid11',
+  },
+  {
+    directory: 'uuid2',
+    subDirectory: 'uuid22',
+  },
+  {
+    directory: 'uuid3',
+    subDirectory: 'uuid33',
+  },
+  {
+    directory: 'uuid4',
+    subDirectory: 'uuid44',
+  },
+  {
+    directory: 'uuid5',
+    subDirectory: 'uuid55',
+  },
+  {
+    directory: 'uuid6',
+    subDirectory: 'uuid66',
+  },
+] as unknown as ITilesLocation[];
+
+const swapDiscreteArray = [
+  {
+    id: '37451d7f-aaa3-4bc6-9e68-7cb5eae764b1',
+    resourceId: 'demo_1',
+    version: 'tiles',
+    tasks: [
+      {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        parameters: {
+          minZoom: 0,
+          maxZoom: 8,
+        },
+        updateDate: '2021-03-15T08:06:29.117Z',
+        status: 'Pending',
+        reason: '',
+        attempts: 0,
+      },
+    ],
+    parameters: {
+      fileNames: ['tile1.png', 'tile2.png', 'tile3.png'],
+      originDirectory: 'fakeDir1/fakeDir2',
+      metadata: {
+        id: 'a9ec652c-e3e8-479f-a14d-b504514ab4af',
+        productId: 'demo_1',
+        productVersion: '5.0',
+        productType: 'OrthophotoHistory',
+      },
+      cleanupData: {
+        previousRelativePath: 'a38a5d82-e047-4714-855a-a39d3395899e',
+        previousProductVersion: '4.0',
+      },
+    },
+    created: '2021-04-25T13:10:06.614Z',
+    updated: '2021-04-25T13:10:06.614Z',
+    status: 'Completed',
+    reason: '',
+    isCleaned: true,
+  },
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 ];
 
 const discreteTilesLocationsArray = [
@@ -327,9 +425,31 @@ const urisArray = [
   '/tiffs/fakeDir11/fakeDir12',
 ];
 
+const urisFsArray = [
+  '/tiles/uuid1/uuid11',
+  '/tiles/uuid2/uuid22',
+  '/tiles/uuid3/uuid33',
+  '/tiles/uuid4/uuid44',
+  '/tiles/uuid5/uuid55',
+  '/tiles/uuid6/uuid66',
+];
+
 const s3KeysArray = urisArray.map((uri) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   return { Key: uri };
 });
 
+<<<<<<< HEAD
 export { discreteArray, discreteSourcesLocationsArray, discreteTilesLocationsArray, swapDiscreteArray, urisArray, s3KeysArray };
+=======
+export {
+  discreteArray,
+  discreteSourcesLocationsArray,
+  discreteTilesLocationsArray,
+  discreteTilesArray,
+  swapDiscreteArray,
+  urisArray,
+  urisFsArray,
+  s3KeysArray,
+};
+>>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209

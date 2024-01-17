@@ -1,27 +1,25 @@
 import fs from 'node:fs';
-<<<<<<< HEAD
-import path from 'path';
-=======
 import path from 'node:path';
->>>>>>> 5c8989efdb51f70b11666503d227ad33a78d7209
 import jsLogger from '@map-colonies/js-logger';
-import { FsSourcesStorageProvider } from '../../../../src/storageProviders/fs/fsSourcesStorageProvider';
-import { configMock, initConfig } from '../../../mocks/config';
-import { discreteSourcesLocationsArray, urisArray } from '../../../testData';
+import { FsTileStorageProvider } from '../../../../src/storageProviders/fs/fsTileStorageProvider';
+import { configMock, initConfig, setConfigValue } from '../../../mocks/config';
+import { discreteTilesArray, urisFsArray } from '../../../testData';
 
 const logger = jsLogger({ enabled: false });
 let deleteDirMock: jest.SpyInstance;
 //fix linter dont liking variable names with "Provider"
 // eslint-disable-next-line @typescript-eslint/naming-convention
-let fsSourcesStorageProvider: FsSourcesStorageProvider;
+let fsTileStorageProvider: FsTileStorageProvider;
 
 describe('fsSourcesStorageProvider', () => {
   beforeEach(() => {
     initConfig();
+    setConfigValue('fs.tiles_location', '/tiles');
+
     deleteDirMock = jest.spyOn(fs.promises, 'rm').mockResolvedValue(undefined);
     jest.spyOn(path, 'join').mockImplementation((...args) => args.join('/'));
 
-    fsSourcesStorageProvider = new FsSourcesStorageProvider(logger, configMock);
+    fsTileStorageProvider = new FsTileStorageProvider(logger, configMock);
   });
 
   afterEach(() => {
@@ -29,11 +27,10 @@ describe('fsSourcesStorageProvider', () => {
     jest.resetAllMocks();
   });
 
-  it('Checks tiffs deletion functionality', async () => {
-    await fsSourcesStorageProvider.deleteDiscretes(discreteSourcesLocationsArray);
-
-    expect(deleteDirMock).toHaveBeenCalledTimes(urisArray.length);
-    for (const uri of urisArray) {
+  it('Checks tiles deletion functionality', async () => {
+    await fsTileStorageProvider.deleteDiscretes(discreteTilesArray);
+    expect(deleteDirMock).toHaveBeenCalledTimes(urisFsArray.length);
+    for (const uri of urisFsArray) {
       expect(deleteDirMock).toHaveBeenCalledWith(uri, { recursive: true, force: true });
     }
   });
