@@ -133,8 +133,8 @@ env:
     delay: exponential
     shouldResetTimeout: true
   cleanupTypes:
-    failedIngestionTasks: false
-    successfulIngestion: false
+    failedIngestionTasks: true
+    successfulIngestion: true
     failedIncomingSyncTasks: true
     successfulSwapUpdate: true
 
