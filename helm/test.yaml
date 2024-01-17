@@ -1,0 +1,97 @@
+---
+# Source: discrete-cleanup/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:  asd-discrete-cleanup-configmap
+data:
+  LOG_LEVEL: "info"
+  LOG_PRETTY_PRINT_ENABLED: "false"
+  
+  
+  JOB_MANAGER_URL: "" 
+  MAPPROXY_API_URL: ""
+  TILES_STORAGE_PROVIDER: ""
+  S3_API_VERSION: "2006-03-01"
+  S3_ENDPOINT: ""
+  S3_SSL_ENABLED: "false"
+  S3_MAX_RETRIES: "3"
+  S3_BUCKET: ""
+  BATCH_SIZE_DISCRETE_LAYERS: "10"
+  BATCH_SIZE_DIRECTORY_TIFF_DELETION: "1"
+  BATCH_SIZE_TILES_DELETION: "1000"
+  FAILED_INGESTION_CLEANUP_DELAY_DAYS: "14"
+  FAILED_SYNC_CLEANUP_DELAY_DAYS: "14"
+  HTTP_RETRY_ATTEMPTS: "3"
+  HTTP_RETRY_DELAY: "exponential"
+  HTTP_RETRY_RESET_TIMEOUT: "true"
+  NEW_INGESTION_JOB_TYPE: ""
+  UPDATE_INGESTION_JOB_TYPE: ""
+  SWAP_UPDATE_INGESTION_JOB_TYPE: ""
+  INCOMING_SYNC_JOB_TYPE: ""
+  EXPORT_JOB_TYPE: ""
+  CLEANUP_TYPES_FAILED_INGESTION_TASKS: "true"
+  CLEANUP_TYPES_SUCCESSFUL_INGESTION: "true"
+  CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: "true"
+  CLEANUP_TYPES_SUCCESSFUL_SWAP_UPDATE_TASKS: "true"
+  FS_BLACK_LIST_SOURCES_LOCATION: "[\"test_dir\"]"
+---
+# Source: discrete-cleanup/templates/cron-job.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name:  asd-discrete-cleanup-cron-job
+  labels:
+    app: discrete-cleanup
+    component: discrete-cleanup
+    environment: development
+    release: asd
+    helm.sh/chart: discrete-cleanup-1.8.4
+    app.kubernetes.io/name: discrete-cleanup
+    app.kubernetes.io/instance: asd
+    app.kubernetes.io/version: "1.8.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+        spec:
+          imagePullSecrets:
+            - name: "my-registry-secret"
+          restartPolicy: OnFailure
+          containers:
+            - name: asd
+              image: my-registry-url.io/discrete-cleanup:latest
+              env:
+                - name: FS_TILES_LOCATION
+                  value: /tiles
+                - name: FS_SOURCES_LOCATION
+                  value: /layerSources
+              envFrom:
+                - configMapRef:
+                    name:  asd-discrete-cleanup-configmap
+              volumeMounts:
+                - name: sources-volume
+                  mountPath: /layerSources
+                - name: tiles-folder
+                  mountPath: /tiles
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+          volumes:
+            - name: sources-volume
+              persistentVolumeClaim:
+                claimName: 
+            - name: tiles-folder
+              persistentVolumeClaim:
+                claimName: asfa
