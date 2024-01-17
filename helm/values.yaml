@@ -2,72 +2,83 @@ global:
   cloudProvider: {}
   tracing: {}
   metrics: {}
-  environment: {}
-
-rasterCommon:
+  environment: ""
   useNodeAffinity: false
   ca:
-    secretName: 'ssss'
+    secretName: ''
     path: '/usr/local/share/ca-certificates'
     key: 'ca.crt'
   serviceUrls:
-    jobManager: http://localhost:8080
-    mapproxyApi: http://localhost:8081
+    jobManager: ""
+    mapproxyApi: ""
   storage:
-    tilesStorageProvider: S3
+    tilesStorageProvider: ""
     fs:
       ingestionSourcePvc:
-        enabled: true
-        name: ingestion-source-pvc
-        subPath: ingestion-source
+        enabled: false
+        name: ""
+        subPath: ""
       internalPvc:
         enabled: true
-        name: internal-pvc
-        tilesSubPath: tiles
+        name: ""
+        tilesSubPath: ""
     s3:
-      endpointUrl: "localhost:9000"
-      tilesBucket: "tiles-dev"
+      endpointUrl: ""
+      tilesBucket: ""
       sslEnabled: false
-      secretName: "ingestion-s3-secret"
+      secretName: ""
   jobManagement:
     ingestion:
       new: 
-        jobType: Ingestion_New
+        jobType: ""
       update: 
-        jobType: Ingestion_Update
+        jobType: ""
       updateSwap:
-        jobType: Ingestion_Swap_Update
+        jobType: ""
     sync:
       incoming:
-        JobType: "syncTarget"
+        JobType: ""
     exporter:
-      JobType: "rasterTilesExporter"
+      JobType: ""
+
+serviceUrls:
+  jobManager: ""
+  mapproxyApi: ""
+storage:
+  tilesStorageProvider: ""
+  fs:
+    ingestionSourcePvc:
+      enabled: false
+      name: ""
+      subPath: ""
+    internalPvc:
+      enabled: false
+      name: ""
+      tilesSubPath: ""
+  s3:
+    endpointUrl: ""
+    tilesBucket: ""
+    sslEnabled: false
+    secretName: ""
+jobManagement:
+  ingestion:
+    new: 
+      jobType: ""
+    update: 
+      jobType: ""
+    updateSwap:
+      jobType: ""
+  sync:
+    incoming:
+      JobType: ""
+  exporter:
+    JobType: ""
 
 authentication:
   ssl:
     enabled: false
     useExternal: false
     externalSecretName: ""
-
-# ====================================================================================================
-# Local certificate files variables
-# ====================================================================================================
-
-local:
-  certs:
-    ca: "certs/ca.crt"
-    ssl: "certs/openssl.cnf"
-  s3:
-    secret:
-      create: false #use for stand alone testing, global s3 secret name should be provided for full deployment
-      accessKeyId: ""
-      secretAccessKey: ""
-  fs:
-    sources:
-      useEmptyDir: false # for local standalone deployment only
-    tiles:
-      useEmptyDir: false # for local standalone deployment only
-
 
 enabled: true
 environment: development
@@ -88,6 +99,13 @@ cron:
   concurrencyPolicy: Forbid
   restartPolicy: OnFailure
 
+# add pod annotations
+# example:
+# podAnnotations:
+  # annotation1: annotation-value-1
+  # annotation2: annotation-value-2
+podAnnotations: {}
+
 env:
   logLevel: info
   logPrettyPrintEnabled: false
@@ -98,7 +116,7 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   fs:
-    blacklist_sources_location:
+    blacklistSourcesLocation:
     - "test_dir"
   s3:
     maxRetries: 3
@@ -129,4 +147,23 @@ resources:
     requests:
       cpu: 100m
       memory: 128Mi
+
+# ====================================================================================================
+# Local certificate files variables
+# ====================================================================================================
+
+local:
+  certs:
+    ca: "certs/ca.crt"
+    ssl: "certs/openssl.cnf"
+  s3:
+    secret:
+      create: false #use for stand alone testing, global s3 secret name should be provided for full deployment
+      accessKeyId: ""
+      secretAccessKey: ""
+  fs:
+    sources:
+      useEmptyDir: false # for local standalone deployment only
+    tiles:
+      useEmptyDir: false # for local standalone deployment only
 
