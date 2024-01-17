@@ -72,11 +72,6 @@ export class CleanupManager {
         jobIds: expiredBatch.map((job) => job.id),
       });
       await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
-      this.logger.info({
-        msg: `Removed sources and complete cleanup of ${expiredBatch.length} for all expired jobs`,
-        batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
-        jobIds: expiredBatch.map((job) => job.id),
-      });
     }
   }
 
