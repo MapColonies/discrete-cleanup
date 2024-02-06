@@ -198,14 +198,12 @@ describe('CleanupManager', () => {
       const expiredJobs = [failedJobs[2]];
       const expectedSourceDirectories = [{ directory: expiredJobs[0].parameters.originDirectory }];
       const expectedTilesDirectories = [
-        { directory: failedJobs[0].parameters.metadata.id, subDirectory: failedJobs[0].parameters.metadata.displayPath },
-        { directory: failedJobs[1].parameters.metadata.id, subDirectory: failedJobs[1].parameters.metadata.displayPath },
         { directory: failedJobs[2].parameters.metadata.id, subDirectory: failedJobs[2].parameters.metadata.displayPath },
       ];
 
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
-      expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
+      expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
     });
   });
