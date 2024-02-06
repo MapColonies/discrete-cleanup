@@ -18,8 +18,8 @@ import {
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { initConfig, configMock, setConfigValue } from '../../mocks/config';
 import { discreteArray, swapDiscreteArray } from '../../testData';
-import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 import { IDataLocation } from '../../../src/common/interfaces';
+import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
 describe('CleanupCommand', function () {
   let cli: CleanupCommandCliTrigger;
