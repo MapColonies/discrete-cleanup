@@ -99,10 +99,12 @@ export class CleanupManager {
         ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.originDirectory) : [],
       });
       const expiredBatch = this.filterExpiredFailedTasks(blackListFilteredBatch, this.successCleanupDelayDays);
-      const sourcesDirectories = this.getSourcesLocation(expiredBatch);
+
       if (!this.disableSourcesCleanup) {
+        const sourcesDirectories = this.getSourcesLocation(expiredBatch);
         await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
       }
+
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
       this.logger.info({
         msg: `Complete and mark jobs as 'Completed' with file directories remove`,
