@@ -130,6 +130,8 @@ env:
     sync: 14
   successCleanupDelayDays: 
     ingestion: 14
+  disableCleanup:
+    sources: false  
   httpRetry:
     attempts: 3
     delay: exponential

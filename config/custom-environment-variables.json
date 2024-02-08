@@ -80,6 +80,12 @@
       "__format": "number"
     }
   },
+  "disable_cleanup": {
+    "sources": {
+      "__name": "DISABLE_SOURCES_CLEANUP",
+      "__format": "boolean"
+    }
+  },
   "httpRetry": {
     "attempts": {
       "__name": "HTTP_RETRY_ATTEMPTS",

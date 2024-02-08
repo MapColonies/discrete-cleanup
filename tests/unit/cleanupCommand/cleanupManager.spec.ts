@@ -166,6 +166,7 @@ describe('CleanupManager', () => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
     setConfigValue('fs.blacklist_sources_location', 'some_black_directory');
+    setConfigValue('disable_cleanup.sources', false);
     const logger = jsLogger({ enabled: false });
 
     manager = new CleanupManager(

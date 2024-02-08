@@ -17,6 +17,7 @@ export class CleanupManager {
   private readonly successCleanupDelayDays: number;
   private readonly failedCleanupDelayDays: number;
   private readonly failedSyncCleanupDelayDays: number;
+  private readonly disableSourcesCleanup: boolean;
 
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
@@ -35,6 +36,7 @@ export class CleanupManager {
     this.successCleanupDelayDays = this.config.get<number>('success_cleanup_delay_days.ingestion');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
     this.failedSyncCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.sync');
+    this.disableSourcesCleanup = this.config.get<boolean>('disable_cleanup.sources');
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
@@ -98,7 +100,9 @@ export class CleanupManager {
       });
       const expiredBatch = this.filterExpiredFailedTasks(blackListFilteredBatch, this.successCleanupDelayDays);
       const sourcesDirectories = this.getSourcesLocation(expiredBatch);
-      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+      if (!this.disableSourcesCleanup) {
+        await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+      }
       await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
       this.logger.info({
         msg: `Complete and mark jobs as 'Completed' with file directories remove`,
@@ -136,7 +140,10 @@ export class CleanupManager {
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
         ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.originDirectory) : [],
       });
-      await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+
+      if (!this.disableSourcesCleanup) {
+        await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
+      }
 
       if (notRunningExportFilteredBatch.length) {
         this.logger.info({
@@ -221,7 +228,7 @@ export class CleanupManager {
     delayDays: number
   ): Promise<IJob<IWithCleanDataIngestionParams>[]> {
     const expiredBatch = this.filterExpiredFailedTasks(tasks, delayDays);
-    if (expiredBatch.length > 0) {
+    if (expiredBatch.length > 0 && !this.disableSourcesCleanup) {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
