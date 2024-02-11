@@ -44,6 +44,9 @@
     "ingestion": 14,
     "sync": 14
   },
+  "success_cleanup_delay_days": {
+    "ingestion": 0
+  },
   "httpRetry": {
     "attempts": 3,
     "delay": "exponential",
