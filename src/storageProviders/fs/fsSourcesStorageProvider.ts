@@ -9,7 +9,7 @@ export class FsSourcesStorageProvider extends FsStorageProviderBase {
   protected readonly fsSourcesLocation: string;
 
   public constructor(@inject(SERVICES.LOGGER) logger: Logger, @inject(SERVICES.CONFIG) protected readonly config: IConfig) {
-    super(config.get<number>('batch_size.tiffDirectoryDeletion'), logger);
+    super(config, config.get<number>('batch_size.tiffDirectoryDeletion'), logger);
     this.fsSourcesLocation = this.config.get<string>('fs.sources_location');
   }
 

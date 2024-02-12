@@ -9,7 +9,7 @@ export class FsTileStorageProvider extends FsStorageProviderBase {
   protected readonly fsTilesLocation: string;
 
   public constructor(@inject(SERVICES.LOGGER) logger: Logger, @inject(SERVICES.CONFIG) protected readonly config: IConfig) {
-    super(config.get<number>('batch_size.tilesDeletion'), logger);
+    super(config, config.get<number>('batch_size.tilesDeletion'), logger);
     this.fsTilesLocation = this.config.get<string>('fs.tiles_location');
   }
 

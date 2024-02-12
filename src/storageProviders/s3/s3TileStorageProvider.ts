@@ -21,6 +21,7 @@ export class S3TileStorageProvider implements IStorageProvider {
   private readonly s3: S3;
   private readonly s3Config: IS3Config;
   private readonly batchSize: number;
+  private readonly disableSourcesCleanup: boolean;
 
   public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, @inject(SERVICES.LOGGER) private readonly logger: Logger) {
     this.s3Config = this.config.get<IS3Config>('s3');
@@ -38,9 +39,14 @@ export class S3TileStorageProvider implements IStorageProvider {
       maxRetries: this.s3Config.maxRetries,
     });
     this.batchSize = config.get<number>('batch_size.tilesDeletion');
+    this.disableSourcesCleanup = this.config.get<boolean>('disableCleanup.sources');
   }
 
   public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
+    if (this.disableSourcesCleanup) {
+      this.logger.info({ msg: 'Sources cleanup is disabled' });
+      return;
+    }
     const s3PreFixes = this.concatDirectories(discreteLocationArray);
     this.logger.info({ msg: `Deleting S3 tiles objectsKeys for provided prefixes`, s3PreFixes });
     for (const s3Prefix of s3PreFixes) {
