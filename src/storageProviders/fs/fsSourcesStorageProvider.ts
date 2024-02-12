@@ -16,11 +16,11 @@ export class FsSourcesStorageProvider extends FsStorageProviderBase {
   }
 
   public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
-    if (!this.disableSourcesCleanup) {
-      await super.deleteDiscretes(discreteLocationArray);
-    } else {
+    if (this.disableSourcesCleanup) {
       this.logger.info({ msg: 'sources deletion is disabled' });
+      return;
     }
+    await super.deleteDiscretes(discreteLocationArray);
   }
 
   protected concatDirectories(discreteLocationArray: IDataLocation[]): string[] {

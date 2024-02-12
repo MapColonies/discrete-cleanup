@@ -47,7 +47,7 @@
   "success_cleanup_delay_days": {
     "ingestion": 0
   },
-  "disableSourcesCleanup": true,
+  "disableSourcesCleanup": false,
   "httpRetry": {
     "attempts": 3,
     "delay": "exponential",
