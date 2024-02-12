@@ -1,6 +1,6 @@
 {
   "name": "discrete-cleanup",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "description": "This is the discrete layers cleanup job",
   "main": "./src/index.ts",
   "scripts": {
