@@ -80,11 +80,9 @@
       "__format": "number"
     }
   },
-  "disableCleanup": {
-    "sources": {
-      "__name": "DISABLE_CLEANUP_SOURCES",
-      "__format": "boolean"
-    }
+  "disableSourcesCleanup": {
+    "__name": "DISABLE_SOURCES_CLEANUP",
+    "__format": "boolean"
   },
   "httpRetry": {
     "attempts": {

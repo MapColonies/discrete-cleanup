@@ -7,10 +7,20 @@ import { FsStorageProviderBase } from './fsStorageProviderBase';
 
 export class FsSourcesStorageProvider extends FsStorageProviderBase {
   protected readonly fsSourcesLocation: string;
+  protected readonly disableSourcesCleanup: boolean;
 
   public constructor(@inject(SERVICES.LOGGER) logger: Logger, @inject(SERVICES.CONFIG) protected readonly config: IConfig) {
-    super(config, config.get<number>('batch_size.tiffDirectoryDeletion'), logger);
+    super(config.get<number>('batch_size.tiffDirectoryDeletion'), logger);
     this.fsSourcesLocation = this.config.get<string>('fs.sources_location');
+    this.disableSourcesCleanup = this.config.get<boolean>('disableSourcesCleanup');
+  }
+
+  public async deleteDiscretes(discreteLocationArray: IDataLocation[]): Promise<void> {
+    if (!this.disableSourcesCleanup) {
+      await super.deleteDiscretes(discreteLocationArray);
+    } else {
+      this.logger.info({ msg: 'sources deletion is disabled' });
+    }
   }
 
   protected concatDirectories(discreteLocationArray: IDataLocation[]): string[] {

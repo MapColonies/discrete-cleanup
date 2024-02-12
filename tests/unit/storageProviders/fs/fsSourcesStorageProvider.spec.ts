@@ -25,7 +25,7 @@ describe('fsSourcesStorageProvider', () => {
   });
   describe('deleteDiscretesWithSourcesDeletion', () => {
     beforeAll(() => {
-      setConfigValue('disableCleanup.sources', false);
+      setConfigValue('disableSourcesCleanup', false);
     });
 
     it('Checks tiffs deletion functionality', async () => {
@@ -40,7 +40,7 @@ describe('fsSourcesStorageProvider', () => {
 
   describe('deleteDiscretesWithoutSourcesDeletion', () => {
     beforeAll(() => {
-      setConfigValue('disableCleanup.sources', true);
+      setConfigValue('disableSourcesCleanup', true);
     });
     it('does not delete sources when cleanup is disabled', async () => {
       await fsSourcesStorageProvider.deleteDiscretes(discreteSourcesLocationsArray);

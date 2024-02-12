@@ -166,7 +166,7 @@ describe('CleanupManager', () => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
     setConfigValue('fs.blacklist_sources_location', 'some_black_directory');
-    setConfigValue('disableCleanup.sources', false);
+    setConfigValue('disableSourcesCleanup', false);
     const logger = jsLogger({ enabled: false });
 
     manager = new CleanupManager(
@@ -210,7 +210,7 @@ describe('CleanupManager', () => {
   });
 
   describe('cleanWithoutSourceDeletion', () => {
-    setConfigValue('disableCleanup.sources', true);
+    setConfigValue('disableSourcesCleanup', true);
     it('failed job sources will not be deleted', async () => {
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedJobs);
       deleteLayersMock.mockResolvedValue([]);
@@ -224,7 +224,7 @@ describe('CleanupManager', () => {
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveReturnedWith(undefined);
     });
 
-    it('sources job sources will not be deleted', async () => {
+    it('success job sources will not be deleted', async () => {
       getSuccessNotCleanedJobsMock.mockResolvedValue(ingestionNewJobs);
       markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
       await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
