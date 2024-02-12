@@ -166,6 +166,7 @@ describe('CleanupManager', () => {
     initConfig();
     setConfigValue('batch_size.discreteLayers', 100);
     setConfigValue('fs.blacklist_sources_location', 'some_black_directory');
+    setConfigValue('disableSourcesCleanup', false);
     const logger = jsLogger({ enabled: false });
 
     manager = new CleanupManager(
@@ -205,6 +206,32 @@ describe('CleanupManager', () => {
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
+    });
+  });
+
+  describe('cleanWithoutSourceDeletion', () => {
+    setConfigValue('disableSourcesCleanup', true);
+    it('failed job sources will not be deleted', async () => {
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedJobs);
+      deleteLayersMock.mockResolvedValue([]);
+      await manager.cleanFailedIngestionTasks();
+
+      const expiredJobs = [failedJobs[2]];
+      const expectedSourceDirectories = [{ directory: expiredJobs[0].parameters.originDirectory }];
+
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(2);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveReturnedWith(undefined);
+    });
+
+    it('success job sources will not be deleted', async () => {
+      getSuccessNotCleanedJobsMock.mockResolvedValue(ingestionNewJobs);
+      markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
+      await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
+
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveReturnedWith(undefined);
     });
   });
 
