@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.8](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.7...v1.8.8) (2024-02-20)
+
+
+### Bug Fixes
+
+* support helm registry auto pushing ([#37](https://github.com/MapColonies/discrete-cleanup/issues/37)) ([64a8d91](https://github.com/MapColonies/discrete-cleanup/commit/64a8d914a687116d304a98f5455d961622d38e9e))
+* update mc-models package ([#36](https://github.com/MapColonies/discrete-cleanup/issues/36)) ([6cfa3cf](https://github.com/MapColonies/discrete-cleanup/commit/6cfa3cfa6f5e367733b4700f0ab6c52c1b7d3708))
+
 ### [1.8.7](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.6...v1.8.7) (2024-02-12)
 
 ### [1.8.6](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.5...v1.8.6) (2024-02-11)
