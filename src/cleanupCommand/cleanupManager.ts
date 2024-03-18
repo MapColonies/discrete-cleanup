@@ -5,6 +5,7 @@ import { MapproxyClient } from '../clients/mapproxyClient';
 import { SERVICES } from '../common/constants';
 import { IConfig, IJob, IWithCleanDataIngestionParams, IDataLocation, ITilesLocation } from '../common/interfaces';
 import { IStorageProvider } from '../storageProviders/iStorageProvider';
+import { extractRootDirectory } from '../common/utils';
 
 @singleton()
 export class CleanupManager {
@@ -43,20 +44,22 @@ export class CleanupManager {
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = await this.deleteExpiredTasksSources(currentBatch, this.failedCleanupDelayDays);
-      this.logger.info({
-        msg: `Will execute cleanup to ${expiredBatch.length} failed jobs of type: '${this.newIngestionJobType}'`,
-        batch: `${i + 1}/${Math.floor(notCleanedAndFailedNew.length / this.discreteBatchSize + 1)}`,
-        jobIds: expiredBatch.map((job) => job.id),
-      });
-      const tilesDirectories = this.getTilesLocation(expiredBatch);
-      await this.tileProvider.deleteDiscretes(tilesDirectories);
-      const failedDiscreteLayers = await this.mapproxy.deleteLayers(expiredBatch);
-      const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
-      this.logger.info({
-        msg: `Complete and mark jobs as 'Completed' with file directories remove for all expired jobs`,
-        jobIds: completedDiscretes.map((job) => job.id),
-      });
-      await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
+      if (expiredBatch.length > 0) {
+        this.logger.info({
+          msg: `Will execute cleanup to ${expiredBatch.length} failed jobs of type: '${this.newIngestionJobType}'`,
+          batch: `${i + 1}/${Math.floor(notCleanedAndFailedNew.length / this.discreteBatchSize + 1)}`,
+          jobIds: expiredBatch.map((job) => job.id),
+        });
+        const tilesDirectories = this.getTilesLocation(expiredBatch);
+        await this.tileProvider.deleteDiscretes(tilesDirectories);
+        const failedDiscreteLayers = await this.mapproxy.deleteLayers(expiredBatch);
+        const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
+        this.logger.info({
+          msg: `Complete and mark jobs as 'Completed' with file directories remove for all expired jobs`,
+          jobIds: completedDiscretes.map((job) => job.id),
+        });
+        await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
+      }
     }
 
     this.logger.info({ msg: `Running Cleanup for failed expired ingestion jobs of type: ${this.updateIngestionJobType}` });
@@ -80,7 +83,6 @@ export class CleanupManager {
   public async cleanSuccessfulIngestionTasks(ingestionJobType: string): Promise<void> {
     this.logger.info({ msg: `Running Cleanup for success ingestion jobs of type: ${ingestionJobType}` });
     const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedJobs(ingestionJobType);
-
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(currentBatch) : currentBatch;
@@ -89,8 +91,12 @@ export class CleanupManager {
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: blackListFilteredBatch.map((job) => job.id),
       });
-      const sourcesToDelete = currentBatch.filter((discrete) => !this.sourceBlackList.includes(discrete.parameters.originDirectory));
-      const ignoredSources = currentBatch.filter((discrete) => this.sourceBlackList.includes(discrete.parameters.originDirectory));
+      const sourcesToDelete = currentBatch.filter(
+        (discrete) => !this.sourceBlackList.includes(extractRootDirectory(discrete.parameters.originDirectory))
+      );
+      const ignoredSources = currentBatch.filter((discrete) =>
+        this.sourceBlackList.includes(extractRootDirectory(discrete.parameters.originDirectory))
+      );
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
@@ -129,8 +135,12 @@ export class CleanupManager {
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
 
-      const sourcesToDelete = notRunningExportFilteredBatch.filter((discrete) => !this.sourceBlackList.includes(discrete.parameters.originDirectory));
-      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) => this.sourceBlackList.includes(discrete.parameters.originDirectory));
+      const sourcesToDelete = notRunningExportFilteredBatch.filter(
+        (discrete) => !this.sourceBlackList.includes(extractRootDirectory(discrete.parameters.originDirectory))
+      );
+      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) =>
+        this.sourceBlackList.includes(extractRootDirectory(discrete.parameters.originDirectory))
+      );
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
@@ -190,7 +200,8 @@ export class CleanupManager {
     const filteredTasks: IJob<IWithCleanDataIngestionParams>[] = [];
     for (let i = 0; i < tasks.length; i++) {
       const originDirectory = tasks[i].parameters.originDirectory;
-      if (!this.sourceBlackList.includes(originDirectory)) {
+      const originRootDirectory = extractRootDirectory(originDirectory);
+      if (!this.sourceBlackList.includes(originRootDirectory)) {
         filteredTasks.push(tasks[i]);
       }
     }

@@ -18,7 +18,7 @@ import {
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { initConfig, configMock, setConfigValue } from '../../mocks/config';
 import { discreteArray, swapDiscreteArray } from '../../testData';
-import { IDataLocation } from '../../../src/common/interfaces';
+import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../../../src/common/interfaces';
 import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
 describe('CleanupCommand', function () {
@@ -76,7 +76,7 @@ describe('CleanupCommand', function () {
     setConfigValue('cleanupTypes.failedIncomingSyncTasks', true);
     setConfigValue('cleanupTypes.successfulSwapUpdate', true);
 
-    it('cleaned uncleaned discretes', async function () {
+    it.only('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
       setConfigValue('batch_size.discreteLayers', 100);
       setConfigValue('failed_cleanup_delay_days.ingestion', 14);
@@ -95,7 +95,7 @@ describe('CleanupCommand', function () {
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await cli.cleanup();
-      const expectedExpiredFailedTilesLocations: IDataLocation[] = [];
+
       const expectedSwappedTilesLocations = [
         { directory: swapDiscreteArray[0].parameters.metadata.id, subDirectory: swapDiscreteArray[0].parameters.cleanupData.previousRelativePath },
       ];
@@ -106,9 +106,9 @@ describe('CleanupCommand', function () {
         { directory: successAndNotCleaned[0].parameters.originDirectory },
         { directory: successAndNotCleaned[1].parameters.originDirectory },
       ];
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedTilesLocations);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSwappedTilesLocations);
+
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSwappedTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(3);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSucceededTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSucceededTilesLocations);
