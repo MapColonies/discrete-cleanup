@@ -18,7 +18,6 @@ import {
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { initConfig, configMock, setConfigValue } from '../../mocks/config';
 import { discreteArray, swapDiscreteArray } from '../../testData';
-import { IDataLocation, IJob, IWithCleanDataIngestionParams } from '../../../src/common/interfaces';
 import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
 describe('CleanupCommand', function () {
@@ -76,7 +75,7 @@ describe('CleanupCommand', function () {
     setConfigValue('cleanupTypes.failedIncomingSyncTasks', true);
     setConfigValue('cleanupTypes.successfulSwapUpdate', true);
 
-    it.only('cleaned uncleaned discretes', async function () {
+    it('cleaned uncleaned discretes', async function () {
       jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
       setConfigValue('batch_size.discreteLayers', 100);
       setConfigValue('failed_cleanup_delay_days.ingestion', 14);
