@@ -92,12 +92,8 @@ export class CleanupManager {
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: blackListFilteredBatch.map((job) => job.id),
       });
-      const sourcesToDelete = currentBatch.filter(
-        (discrete) => !this.isIncludedInBlaclist(discrete.parameters.originDirectory)
-      );
-      const ignoredSources = currentBatch.filter((discrete) =>
-        this.isIncludedInBlaclist(discrete.parameters.originDirectory)
-      );
+      const sourcesToDelete = currentBatch.filter((discrete) => !this.isIncludedInBlaclist(discrete.parameters.originDirectory));
+      const ignoredSources = currentBatch.filter((discrete) => this.isIncludedInBlaclist(discrete.parameters.originDirectory));
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
@@ -135,12 +131,8 @@ export class CleanupManager {
       const blackListFilteredBatch =
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
-      const sourcesToDelete = notRunningExportFilteredBatch.filter(
-        (discrete) => !this.isIncludedInBlaclist(discrete.parameters.originDirectory)
-      );
-      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) =>
-        this.isIncludedInBlaclist(discrete.parameters.originDirectory)
-      );
+      const sourcesToDelete = notRunningExportFilteredBatch.filter((discrete) => !this.isIncludedInBlaclist(discrete.parameters.originDirectory));
+      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) => this.isIncludedInBlaclist(discrete.parameters.originDirectory));
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
         sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
