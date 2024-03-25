@@ -66,6 +66,7 @@ spec:
               {{- with .Values.image }}
               image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ $imageTag }}
               {{- end }}
+              imagePullPolicy: {{ .Values.imagePullPolicy }}
               env:
               {{- if eq (upper $storage.tilesStorageProvider) "S3" }}
                 - name: S3_ACCESS_KEY_ID
@@ -123,7 +124,7 @@ spec:
                 {{- toYaml .Values.resources.value | nindent 16 }}
               {{- end }}
           volumes:
-          {{- if or .Values.env.cleanupTypes.failedIngestionTasks .Values.env.cleanupTypes.successfulIngestion }}
+          {{- if or (.Values.env.cleanupTypes.failedIngestionTasks) (.Values.env.cleanupTypes.successfulIngestion) (.Values.env.cleanupTypes.successfulSwapUpdate) }}
             - name: sources-volume
             {{- if .Values.local.fs.sources.useEmptyDir }}
               emptyDir: {}

@@ -12,7 +12,6 @@ export class MapproxyClient extends HttpClient {
 
   public async deleteLayers(discreteLayers: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
     const mapProxyLayersToDelete: string[] = [];
-
     for (const discrete of discreteLayers) {
       const productType = discrete.parameters.metadata.productType as string;
       this.logger.info(`Deleting layer: [${discrete.resourceId}-${productType}]`);
