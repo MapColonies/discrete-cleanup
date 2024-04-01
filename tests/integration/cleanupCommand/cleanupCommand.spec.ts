@@ -37,6 +37,7 @@ describe('CleanupCommand', function () {
 
   beforeEach(function () {
     jest.spyOn(global.console, 'error').mockReturnValue(undefined); // prevent cli error logs from messing with test log on bad path tests
+    isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlacklist: jest.Mock }, 'isIncludedInBlacklist');
     processExitMock = jest.spyOn(global.process, 'exit');
     processExitMock.mockReturnValueOnce(undefined); //prevent cli exit from killing the test
 
@@ -44,6 +45,7 @@ describe('CleanupCommand', function () {
     tileProvider = createStorageProviderMock();
     sourcesProvider = createStorageProviderMock();
 
+    container.clearInstances();
     container.registerInstance(JobManagerClient, jobManagerClientMock);
     container.registerInstance(MapproxyClient, mapproxyClientMock);
 
@@ -123,6 +125,7 @@ describe('CleanupCommand', function () {
       setConfigValue('failed_cleanup_delay_days.ingestion', 14);
       setConfigValue('failed_cleanup_delay_days.sync', 14);
       setConfigValue('success_cleanup_delay_days.ingestion', 0);
+
       const failedAndNotCleaned = discreteArray.slice(0, 2);
       const expiredFailedData = [
         {
@@ -131,7 +134,8 @@ describe('CleanupCommand', function () {
           updated: '2020-04-25T13:10:06.614Z',
         },
       ];
-      isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlaclist: jest.Mock }, 'isIncludedInBlaclist');
+
+      isIncludedInBlacklistSpy.mockReturnValue(false);
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(expiredFailedData);
       getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
       getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
@@ -176,7 +180,7 @@ describe('CleanupCommand', function () {
           updated: '2020-04-25T13:10:06.614Z',
         },
       ];
-      isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlaclist: jest.Mock }, 'isIncludedInBlaclist');
+
       isIncludedInBlacklistSpy.mockReturnValue(true);
       getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(expiredFailedData);
       getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);

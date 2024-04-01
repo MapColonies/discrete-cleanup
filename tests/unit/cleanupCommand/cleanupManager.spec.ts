@@ -178,7 +178,7 @@ describe('CleanupManager', () => {
       mapproxyClientMock,
       jobManagerClientMock
     );
-    isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlaclist: jest.Mock }, 'isIncludedInBlaclist');
+    isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlacklist: jest.Mock }, 'isIncludedInBlacklist');
   });
 
   afterEach(() => {
