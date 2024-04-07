@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.9](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.8...v1.8.9) (2024-04-07)
+
+
+### Bug Fixes
+
+* origin directory prefix + added expired batch condition (MAPCO-4101) ([#38](https://github.com/MapColonies/discrete-cleanup/issues/38)) ([aa3ff83](https://github.com/MapColonies/discrete-cleanup/commit/aa3ff8390788b2be54df12b2a76d5afea46081b5))
+
 ### [1.8.8](https://github.com/MapColonies/discrete-cleanup/compare/v1.8.7...v1.8.8) (2024-02-20)
 
 
