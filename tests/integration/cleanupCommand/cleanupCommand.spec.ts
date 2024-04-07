@@ -18,12 +18,14 @@ import {
 import { mapproxyClientMock, deleteLayersMock } from '../../mocks/clients/mapproxyClient';
 import { initConfig, configMock, setConfigValue } from '../../mocks/config';
 import { discreteArray, swapDiscreteArray } from '../../testData';
-import { IDataLocation } from '../../../src/common/interfaces';
+import { IDataLocation, ITilesLocation } from '../../../src/common/interfaces';
+import { CleanupManager } from '../../../src/cleanupCommand/cleanupManager';
 import { CleanupCommandCliTrigger } from './helpers/CliTrigger';
 
 describe('CleanupCommand', function () {
   let cli: CleanupCommandCliTrigger;
   let processExitMock: jest.SpyInstance;
+  let isIncludedInBlacklistSpy: jest.SpyInstance;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   let tileProvider: IStorageProviderMock;
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -35,6 +37,7 @@ describe('CleanupCommand', function () {
 
   beforeEach(function () {
     jest.spyOn(global.console, 'error').mockReturnValue(undefined); // prevent cli error logs from messing with test log on bad path tests
+    isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlacklist: jest.Mock }, 'isIncludedInBlacklist');
     processExitMock = jest.spyOn(global.process, 'exit');
     processExitMock.mockReturnValueOnce(undefined); //prevent cli exit from killing the test
 
@@ -42,6 +45,7 @@ describe('CleanupCommand', function () {
     tileProvider = createStorageProviderMock();
     sourcesProvider = createStorageProviderMock();
 
+    container.clearInstances();
     container.registerInstance(JobManagerClient, jobManagerClientMock);
     container.registerInstance(MapproxyClient, mapproxyClientMock);
 
@@ -95,7 +99,7 @@ describe('CleanupCommand', function () {
       markAsCompletedMock.mockResolvedValue(undefined);
 
       await cli.cleanup();
-      const expectedExpiredFailedTilesLocations: IDataLocation[] = [];
+
       const expectedSwappedTilesLocations = [
         { directory: swapDiscreteArray[0].parameters.metadata.id, subDirectory: swapDiscreteArray[0].parameters.cleanupData.previousRelativePath },
       ];
@@ -106,13 +110,104 @@ describe('CleanupCommand', function () {
         { directory: successAndNotCleaned[0].parameters.originDirectory },
         { directory: successAndNotCleaned[1].parameters.originDirectory },
       ];
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedTilesLocations);
-      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSwappedTilesLocations);
+
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSwappedTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(3);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedSucceededTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, expectedSucceededTilesLocations);
       expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(3, expectedSwappedSourcesLocations);
+    });
+
+    it('clean failed expired discretes tasks', async function () {
+      jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
+      setConfigValue('batch_size.discreteLayers', 100);
+      setConfigValue('failed_cleanup_delay_days.ingestion', 14);
+      setConfigValue('failed_cleanup_delay_days.sync', 14);
+      setConfigValue('success_cleanup_delay_days.ingestion', 0);
+
+      const failedAndNotCleaned = discreteArray.slice(0, 2);
+      const expiredFailedData = [
+        {
+          ...failedAndNotCleaned[0],
+          created: '2020-04-25T13:10:06.614Z',
+          updated: '2020-04-25T13:10:06.614Z',
+        },
+      ];
+
+      isIncludedInBlacklistSpy.mockReturnValue(false);
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(expiredFailedData);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue([]);
+      getInProgressJobsMock.mockResolvedValue([]);
+      deleteLayersMock.mockResolvedValue([]);
+      markAsCompletedMock.mockResolvedValue(undefined);
+
+      await cli.cleanup();
+
+      const expectedExpiredFailedTilesLocations: ITilesLocation[] = [
+        {
+          directory: expiredFailedData[0].parameters.metadata.id as string,
+          subDirectory: expiredFailedData[0].parameters.metadata.displayPath as string,
+        },
+      ];
+
+      const expectedExpiredFailedSourceLocations: IDataLocation[] = [{ directory: expiredFailedData[0].parameters.originDirectory }];
+
+      expect(isIncludedInBlacklistSpy).toHaveBeenCalledTimes(2);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(1, expiredFailedData[0].parameters.originDirectory);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredFailedData[0].parameters.originDirectory);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedSourceLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedSourceLocations);
+    });
+
+    it('will not clean failed expired discretes tasks that included in the blacklist', async function () {
+      jest.setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
+      setConfigValue('batch_size.discreteLayers', 100);
+      setConfigValue('failed_cleanup_delay_days.ingestion', 14);
+      setConfigValue('failed_cleanup_delay_days.sync', 14);
+      setConfigValue('success_cleanup_delay_days.ingestion', 0);
+      const failedAndNotCleaned = discreteArray.slice(0, 2);
+      const expiredFailedData = [
+        {
+          ...failedAndNotCleaned[0],
+          created: '2020-04-25T13:10:06.614Z',
+          updated: '2020-04-25T13:10:06.614Z',
+        },
+      ];
+
+      isIncludedInBlacklistSpy.mockReturnValue(true);
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(expiredFailedData);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getSuccessNotCleanedJobsMock.mockResolvedValueOnce([]);
+      getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue([]);
+      getInProgressJobsMock.mockResolvedValue([]);
+      deleteLayersMock.mockResolvedValue([]);
+      markAsCompletedMock.mockResolvedValue(undefined);
+
+      await cli.cleanup();
+
+      const expectedExpiredFailedTilesLocations: ITilesLocation[] = [
+        {
+          directory: expiredFailedData[0].parameters.metadata.id as string,
+          subDirectory: expiredFailedData[0].parameters.metadata.displayPath as string,
+        },
+      ];
+
+      expect(isIncludedInBlacklistSpy).toHaveBeenCalledTimes(2);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(1, expiredFailedData[0].parameters.originDirectory);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredFailedData[0].parameters.originDirectory);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenCalledTimes(1);
+      expect(tileProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, expectedExpiredFailedTilesLocations);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenCalledTimes(2);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(1, []);
+      expect(sourcesProvider.deleteDiscretesMock).toHaveBeenNthCalledWith(2, []);
     });
   });
 });

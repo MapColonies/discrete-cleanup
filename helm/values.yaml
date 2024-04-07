@@ -92,6 +92,8 @@ image:
   repository: discrete-cleanup
   tag: 'latest'
 
+imagePullPolicy: Always
+
 cron:
   schedule:  '0 0 * * *'
   successfulJobsHistoryLimit: 1

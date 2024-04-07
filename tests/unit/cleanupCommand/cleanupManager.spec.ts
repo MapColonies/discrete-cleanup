@@ -157,6 +157,7 @@ describe('CleanupManager', () => {
   const sourcesProviderMock = createStorageProviderMock();
 
   let manager: CleanupManager;
+  let isIncludedInBlacklistSpy: jest.SpyInstance;
 
   beforeAll(() => {
     jest.useFakeTimers().setSystemTime(new Date('2021-04-25T13:10:06.614Z'));
@@ -177,6 +178,7 @@ describe('CleanupManager', () => {
       mapproxyClientMock,
       jobManagerClientMock
     );
+    isIncludedInBlacklistSpy = jest.spyOn(CleanupManager.prototype as unknown as { isIncludedInBlacklist: jest.Mock }, 'isIncludedInBlacklist');
   });
 
   afterEach(() => {
@@ -203,6 +205,31 @@ describe('CleanupManager', () => {
       ];
 
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
+      expect(isIncludedInBlacklistSpy).toHaveBeenCalledTimes(2);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(1, expiredJobs[0].parameters.originDirectory);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredJobs[0].parameters.originDirectory);
+      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
+      expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
+      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
+    });
+
+    it('will not delete failed expired task that included in the blacklist', async () => {
+      getFailedAndNotCleanedIngestionJobsMock.mockResolvedValue(failedJobs);
+      deleteLayersMock.mockResolvedValue([]);
+      markAsCompletedMock.mockResolvedValue(undefined);
+      isIncludedInBlacklistSpy.mockResolvedValue(true);
+
+      await manager.cleanFailedIngestionTasks();
+
+      const expiredJobs = [failedJobs[2]];
+      const expectedTilesDirectories = [
+        { directory: failedJobs[2].parameters.metadata.id, subDirectory: failedJobs[2].parameters.metadata.displayPath },
+      ];
+
+      expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
+      expect(isIncludedInBlacklistSpy).toHaveBeenCalledTimes(2);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(1, expiredJobs[0].parameters.originDirectory);
+      expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredJobs[0].parameters.originDirectory);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
       expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
