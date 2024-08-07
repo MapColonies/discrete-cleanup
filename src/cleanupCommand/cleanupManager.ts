@@ -102,7 +102,8 @@ export class CleanupManager {
       const expiredBatch = this.filterExpiredFailedTasks(blackListFilteredBatch, this.successCleanupDelayDays);
       const sourcesDirectories = this.getSourcesLocation(expiredBatch);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
-      await this.jobManager.markAsCompletedAndRemoveFiles(currentBatch);
+      await this.jobManager.markAsCompletedAndRemoveFiles(sourcesToDelete);
+      await this.jobManager.markAsCompleted(ignoredSources);
       this.logger.info({
         msg: `Complete and mark jobs as 'Completed' with file directories remove`,
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
@@ -111,16 +112,16 @@ export class CleanupManager {
     }
   }
 
-  public async cleanSuccessfulSwappedLayersTasks(swappJobType: string): Promise<void> {
-    this.logger.info({ msg: `Running Cleanup for success ingestion swap update jobs of type: ${swappJobType}` });
-    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedJobs(swappJobType);
+  public async cleanSuccessfulSwappedLayersTasks(swapJobType: string): Promise<void> {
+    this.logger.info({ msg: `Running Cleanup for success ingestion swap update jobs of type: ${swapJobType}` });
+    const notCleanedAndSuccess = await this.jobManager.getSuccessNotCleanedJobs(swapJobType);
     for (let i = 0; i < notCleanedAndSuccess.length; i += this.discreteBatchSize) {
       const currentBatch = notCleanedAndSuccess.slice(i, i + this.discreteBatchSize);
 
       // cleaning tiles of all success jobs excluding layer that been exporting on current iteration.
       const notRunningExportFilteredBatch = await this.filterFromRunningExportJobs(currentBatch);
       this.logger.info({
-        msg: `Will execute cleanup to ${notRunningExportFilteredBatch.length} success jobs of type: '${swappJobType}'`,
+        msg: `Will execute cleanup to ${notRunningExportFilteredBatch.length} success jobs of type: '${swapJobType}'`,
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: notRunningExportFilteredBatch.map((job) => job.id),
       });
@@ -146,6 +147,7 @@ export class CleanupManager {
           jobIds: notRunningExportFilteredBatch.map((job) => job.id),
         });
         await this.jobManager.markAsCompletedAndRemoveFiles(notRunningExportFilteredBatch);
+        await this.jobManager.markAsCompleted(ignoredSources);
       }
     }
   }
