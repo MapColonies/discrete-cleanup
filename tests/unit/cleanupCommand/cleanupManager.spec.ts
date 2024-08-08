@@ -278,13 +278,15 @@ describe('CleanupManager', () => {
     it('expired success jobs Ingestion_New without source deletion', async () => {
       getSuccessNotCleanedJobsMock.mockResolvedValue(ingestionNewJobs);
       markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
+      markAsCompletedMock.mockResolvedValue(undefined);
       await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
 
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(1);
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
       expect(deleteLayersMock).toHaveBeenCalledTimes(0);
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(ingestionNewJobs);
+      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith([]);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(ingestionNewJobs);
     });
   });
 
