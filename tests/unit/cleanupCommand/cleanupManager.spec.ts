@@ -210,7 +210,7 @@ describe('CleanupManager', () => {
       expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredJobs[0].parameters.originDirectory);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
     });
 
     it('will not delete failed expired task that included in the blacklist', async () => {
@@ -232,7 +232,7 @@ describe('CleanupManager', () => {
       expect(isIncludedInBlacklistSpy).toHaveBeenNthCalledWith(2, expiredJobs[0].parameters.originDirectory);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedTilesDirectories);
       expect(deleteLayersMock).toHaveBeenCalledWith(expiredJobs);
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(expiredJobs);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
     });
   });
 
@@ -265,19 +265,18 @@ describe('CleanupManager', () => {
   describe('cleanSuccessIncomingIngestionTasks', () => {
     it('expired success jobs Ingestion_New', async () => {
       getSuccessNotCleanedJobsMock.mockResolvedValue(updateSwapJobs);
-      markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
+      markAsCompletedMock.mockResolvedValue(undefined);
       await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
 
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(1);
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([{ directory: updateSwapJobs[0].parameters.originDirectory }]);
       expect(deleteLayersMock).toHaveBeenCalledTimes(0);
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(updateSwapJobs);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(updateSwapJobs);
     });
 
     it('expired success jobs Ingestion_New without source deletion', async () => {
       getSuccessNotCleanedJobsMock.mockResolvedValue(ingestionNewJobs);
-      markAsCompletedAndRemoveFilesMock.mockResolvedValue(undefined);
       markAsCompletedMock.mockResolvedValue(undefined);
       await manager.cleanSuccessfulIngestionTasks('Ingestion_New');
 
@@ -285,7 +284,6 @@ describe('CleanupManager', () => {
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith([]);
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
       expect(deleteLayersMock).toHaveBeenCalledTimes(0);
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith([]);
       expect(markAsCompletedMock).toHaveBeenCalledWith(ingestionNewJobs);
     });
   });
@@ -322,7 +320,7 @@ describe('CleanupManager', () => {
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectTilesDirectories);
       expect(sourcesProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectSourceDirectories);
 
-      expect(markAsCompletedAndRemoveFilesMock).toHaveBeenCalledWith(updateSwapJobs);
+      expect(markAsCompletedMock).toHaveBeenCalledWith(updateSwapJobs);
     });
 
     it('succeeded swap updated jobs wont be delete old tiles and source files because running export', async () => {
