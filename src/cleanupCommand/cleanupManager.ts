@@ -60,7 +60,7 @@ export class CleanupManager {
         msg: `Complete and mark jobs as 'Completed' with file directories remove for all expired jobs`,
         jobIds: completedDiscretes.map((job) => job.id),
       });
-      await this.jobManager.markAsCompletedAndRemoveFiles(completedDiscretes);
+      await this.jobManager.markAsCompleted(completedDiscretes);
     }
 
     this.logger.info({ msg: `Running Cleanup for failed expired ingestion jobs of type: ${this.updateIngestionJobType}` });
@@ -77,7 +77,7 @@ export class CleanupManager {
         batch: `${i + 1}/${Math.floor(notCleanedAndFailedUpdate.length / this.discreteBatchSize + 1)}`,
         jobIds: expiredBatch.map((job) => job.id),
       });
-      await this.jobManager.markAsCompletedAndRemoveFiles(expiredBatch);
+      await this.jobManager.markAsCompleted(expiredBatch);
     }
   }
 
@@ -102,8 +102,7 @@ export class CleanupManager {
       const expiredBatch = this.filterExpiredFailedTasks(blackListFilteredBatch, this.successCleanupDelayDays);
       const sourcesDirectories = this.getSourcesLocation(expiredBatch);
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
-      await this.jobManager.markAsCompletedAndRemoveFiles(sourcesToDelete);
-      await this.jobManager.markAsCompleted(ignoredSources);
+      await this.jobManager.markAsCompleted(currentBatch);
       this.logger.info({
         msg: `Complete and mark jobs as 'Completed' with file directories remove`,
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
@@ -146,8 +145,7 @@ export class CleanupManager {
           msg: `Complete and mark jobs as 'Completed' with file directories remove`,
           jobIds: notRunningExportFilteredBatch.map((job) => job.id),
         });
-        await this.jobManager.markAsCompletedAndRemoveFiles(notRunningExportFilteredBatch);
-        await this.jobManager.markAsCompleted(ignoredSources);
+        await this.jobManager.markAsCompleted(notRunningExportFilteredBatch);
       }
     }
   }
