@@ -41,8 +41,7 @@
     "tilesDeletion": 1
   },
   "failed_cleanup_delay_days": {
-    "ingestion": 14,
-    "sync": 14
+    "ingestion": 14
   },
   "success_cleanup_delay_days": {
     "ingestion": 0
@@ -57,13 +56,11 @@
     "new_ingestion_job_type": "Ingestion_New",
     "update_ingestion_job_type": "Ingestion_Update",
     "swap_update_ingestion_job_type": "Ingestion_Swap_Update",
-    "incoming_sync_job_type": "syncTarget",
     "export_job_type": "rasterTilesExporter"
   },
   "cleanupTypes": {
     "failedIngestionTasks": true,
     "successfulIngestion": true,
-    "failedIncomingSyncTasks": true,
     "successfulSwapUpdate": true
   }
 }

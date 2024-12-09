@@ -34,7 +34,6 @@ data:
   BATCH_SIZE_DIRECTORY_TIFF_DELETION: {{ .Values.env.batchSize.tiffDirectoryDeletion | quote }}
   BATCH_SIZE_TILES_DELETION: {{ .Values.env.batchSize.tilesDeletion | quote }}
   FAILED_INGESTION_CLEANUP_DELAY_DAYS: {{ .Values.env.failedCleanupDelayDays.ingestion | quote }}
-  FAILED_SYNC_CLEANUP_DELAY_DAYS: {{ .Values.env.failedCleanupDelayDays.sync | quote }}
   SUCCESS_INGESTION_CLEANUP_DELAY_DAYS: {{ .Values.env.successCleanupDelayDays.ingestion | quote }}
   DISABLE_SOURCES_CLEANUP: {{ .Values.env.disableSourcesCleanup | quote }}
   HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts | quote }}
@@ -46,7 +45,6 @@ data:
   EXPORT_JOB_TYPE: {{ $jobDefinitions.jobs.export.type | quote }}
   CLEANUP_TYPES_FAILED_INGESTION_TASKS: {{ .Values.env.cleanupTypes.failedIngestionTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_INGESTION: {{ .Values.env.cleanupTypes.successfulIngestion | quote }}
-  CLEANUP_TYPES_FAILED_INCOMING_SYNC_TASKS: {{ .Values.env.cleanupTypes.failedIncomingSyncTasks | quote }}
   CLEANUP_TYPES_SUCCESSFUL_SWAP_UPDATE_TASKS: {{ .Values.env.cleanupTypes.successfulSwapUpdate | quote }}
   FS_BLACK_LIST_SOURCES_LOCATION: {{ .Values.env.fs.blacklistSourcesLocation | toJson | quote }}
 {{- end }}
