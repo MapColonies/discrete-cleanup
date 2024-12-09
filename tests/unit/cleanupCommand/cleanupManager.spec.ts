@@ -7,7 +7,6 @@ import {
   getFailedAndNotCleanedIngestionJobsMock,
   markAsCompletedMock,
   markAsCompletedAndRemoveFilesMock,
-  getFailedAndNotCleanedIncomingSyncJobsMock,
   getSuccessNotCleanedJobsMock,
   getInProgressJobsMock,
 } from '../../mocks/clients/jobManagerClient';
@@ -285,23 +284,6 @@ describe('CleanupManager', () => {
       expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledTimes(0);
       expect(deleteLayersMock).toHaveBeenCalledTimes(0);
       expect(markAsCompletedMock).toHaveBeenCalledWith(ingestionNewJobs);
-    });
-  });
-
-  describe('cleanFailedIncomingSyncTasks', () => {
-    it('expired failed jobs tiles will be deleted', async () => {
-      getFailedAndNotCleanedIncomingSyncJobsMock.mockResolvedValue(failedJobs);
-      deleteLayersMock.mockResolvedValue([]);
-      markAsCompletedMock.mockResolvedValue(undefined);
-
-      await manager.cleanFailedIncomingSyncTasks();
-
-      const expiredJobs = [failedJobs[2]];
-      const expectedSourceDirectories = [{ directory: expiredJobs[0].parameters.originDirectory }];
-
-      expect(tileProviderMock.deleteDiscretesMock).toHaveBeenCalledWith(expectedSourceDirectories);
-      expect(deleteLayersMock).toHaveBeenCalledWith(failedJobs);
-      expect(markAsCompletedMock).toHaveBeenCalledWith(expiredJobs);
     });
   });
 

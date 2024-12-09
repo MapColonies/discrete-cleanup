@@ -32,9 +32,5 @@ export class CleanupCommand implements CommandModule {
     if (this.config.get<boolean>('cleanupTypes.successfulSwapUpdate')) {
       await this.cleanupManager.cleanSuccessfulSwappedLayersTasks(this.swapUpdateIngestionJobType);
     }
-
-    if (this.config.get<boolean>('cleanupTypes.failedIncomingSyncTasks')) {
-      await this.cleanupManager.cleanFailedIncomingSyncTasks();
-    }
   };
 }
