@@ -13,11 +13,9 @@ export class CleanupManager {
   private readonly newIngestionJobType: string;
   private readonly updateIngestionJobType: string;
   private readonly exporterJobType: string;
-  private readonly syncJobType: string;
   private readonly sourceBlackList: string[];
   private readonly successCleanupDelayDays: number;
   private readonly failedCleanupDelayDays: number;
-  private readonly failedSyncCleanupDelayDays: number;
 
   public constructor(
     @inject(SERVICES.TILE_PROVIDER) private readonly tileProvider: IStorageProvider,
@@ -31,11 +29,9 @@ export class CleanupManager {
     this.newIngestionJobType = config.get('jobTypes.new_ingestion_job_type');
     this.updateIngestionJobType = config.get('jobTypes.update_ingestion_job_type');
     this.exporterJobType = config.get('jobTypes.export_job_type');
-    this.syncJobType = config.get('jobTypes.incoming_sync_job_type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.successCleanupDelayDays = this.config.get<number>('success_cleanup_delay_days.ingestion');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
-    this.failedSyncCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.sync');
   }
 
   public async cleanFailedIngestionTasks(): Promise<void> {
@@ -147,31 +143,6 @@ export class CleanupManager {
         });
         await this.jobManager.markAsCompleted(notRunningExportFilteredBatch);
       }
-    }
-  }
-
-  public async cleanFailedIncomingSyncTasks(): Promise<void> {
-    this.logger.info({ msg: `Running Cleanup for failed incoming sync jobs of type: ${this.syncJobType}` });
-    const notCleanedAndFailed = await this.jobManager.getFailedAndNotCleanedIncomingSyncJobs();
-    for (let i = 0; i < notCleanedAndFailed.length; i += this.discreteBatchSize) {
-      const currentBatch = notCleanedAndFailed.slice(i, i + this.discreteBatchSize);
-      this.logger.info({
-        msg: `Will execute cleanup to ${currentBatch.length} failed incoming sync jobs of type: '${this.syncJobType}'`,
-        batch: `${i + 1}/${Math.floor(notCleanedAndFailed.length / this.discreteBatchSize + 1)}`,
-        jobIds: currentBatch.map((job) => job.id),
-      });
-      const failedDiscreteLayers = await this.mapproxy.deleteLayers(currentBatch);
-      const expiredBatch = this.filterExpiredFailedTasks(currentBatch, this.failedSyncCleanupDelayDays);
-      if (expiredBatch.length > 0) {
-        const sourcesDirectories = this.getSourcesLocation(expiredBatch);
-        await this.tileProvider.deleteDiscretes(sourcesDirectories);
-      }
-      const completedDiscretes = expiredBatch.filter((el) => !failedDiscreteLayers.includes(el));
-      this.logger.info({
-        msg: `Complete and mark jobs as 'Completed'`,
-        jobIds: completedDiscretes.map((job) => job.id),
-      });
-      await this.jobManager.markAsCompleted(completedDiscretes);
     }
   }
 

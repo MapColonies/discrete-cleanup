@@ -7,11 +7,8 @@ import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfac
 
 @singleton()
 export class JobManagerClient extends HttpClient {
-  private readonly incomingSyncJobType: string;
-
   public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, @inject(SERVICES.LOGGER) logger: Logger) {
     super(logger, config.get<string>('job_manager.url'), 'JobManager', config.get<IHttpRetryConfig>('httpRetry'));
-    this.incomingSyncJobType = config.get('jobTypes.incoming_sync_job_type');
   }
 
   public async getSuccessNotCleanedJobs(jobType: string): Promise<IJob<IWithCleanDataIngestionParams>[]> {
@@ -24,12 +21,6 @@ export class JobManagerClient extends HttpClient {
 
   public async getInProgressJobs(jobType: string): Promise<IJob<IWithCleanDataIngestionParams>[]> {
     return this.getJobs(jobType, JobStatus.IN_PROGRESS);
-  }
-
-  public async getFailedAndNotCleanedIncomingSyncJobs(): Promise<IJob<IWithCleanDataIngestionParams>[]> {
-    const failed = await this.getJobs(this.incomingSyncJobType, JobStatus.FAILED);
-    const expired = await this.getJobs(this.incomingSyncJobType, JobStatus.EXPIRED);
-    return failed.concat(expired);
   }
 
   public async markAsCompleted(notCleaned: IJob<IWithCleanDataIngestionParams>[]): Promise<void> {

@@ -11,6 +11,7 @@ global:
   serviceUrls:
     jobManager: ""
     mapproxyApi: ""
+  jobDefinitions: {}
   storage:
     tilesStorageProvider: ""
     fs:
@@ -27,19 +28,6 @@ global:
       tilesBucket: ""
       sslEnabled: false
       secretName: ""
-  jobManagement:
-    ingestion:
-      new: 
-        jobType: ""
-      update: 
-        jobType: ""
-      updateSwap:
-        jobType: ""
-    sync:
-      incoming:
-        JobType: ""
-    exporter:
-      JobType: ""
 
 serviceUrls:
   jobManager: ""
@@ -60,19 +48,17 @@ storage:
     tilesBucket: ""
     sslEnabled: false
     secretName: ""
-jobManagement:
-  ingestion:
-    new: 
-      jobType: ""
-    update: 
-      jobType: ""
-    updateSwap:
-      jobType: ""
-  sync:
-    incoming:
-      JobType: ""
-  exporter:
-    JobType: ""
+
+jobDefinitions:
+  jobs:
+    new:
+      type: ""
+    update:
+      type: ""
+    swapUpdate:
+      type: ""
+    export:
+      type: ""
 
 authentication:
   ssl:
@@ -129,7 +115,6 @@ env:
     tilesDeletion: 1000 #s3 default max limit is 10000 so larger batches will be caped to the s3 limit
   failedCleanupDelayDays:
     ingestion: 14
-    sync: 14
   successCleanupDelayDays: 
     ingestion: 0
   disableSourcesCleanup: false
@@ -140,7 +125,6 @@ env:
   cleanupTypes:
     failedIngestionTasks: true
     successfulIngestion: true
-    failedIncomingSyncTasks: true
     successfulSwapUpdate: true
 
 resources:
