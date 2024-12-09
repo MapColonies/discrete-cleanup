@@ -49,16 +49,16 @@ storage:
     sslEnabled: false
     secretName: ""
 
-  jobDefinitions:
-    jobs:
-      new:
-        type: ""
-      update:
-        type: ""
-      swapUpdate:
-        type: ""
-      export:
-        type: ""
+jobDefinitions:
+  jobs:
+    new:
+      type: ""
+    update:
+      type: ""
+    swapUpdate:
+      type: ""
+    export:
+      type: ""
 
 authentication:
   ssl:
