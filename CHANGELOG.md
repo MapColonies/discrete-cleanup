@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.3](https://github.com/MapColonies/discrete-cleanup/compare/v1.9.2...v1.9.3) (2025-02-24)
+
+
+### Bug Fixes
+
+* removing max_old_space_size from Dockerfile ([#47](https://github.com/MapColonies/discrete-cleanup/issues/47)) ([28f40b7](https://github.com/MapColonies/discrete-cleanup/commit/28f40b7b8e1866df6a5c59ea05a92526951383bb))
+
 ### [1.9.2](https://github.com/MapColonies/discrete-cleanup/compare/v1.9.1...v1.9.2) (2024-12-09)
 
 
