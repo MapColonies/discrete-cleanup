@@ -16,9 +16,9 @@ export class CleanupCommand implements CommandModule {
   private readonly newIngestionJobType: string;
 
   public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, private readonly cleanupManager: CleanupManager) {
-    this.newIngestionJobType = config.get('jobTypes.new_ingestion_job_type');
-    this.updateIngestionJobType = config.get('jobTypes.update_ingestion_job_type');
-    this.swapUpdateIngestionJobType = config.get('jobTypes.swap_update_ingestion_job_type');
+    this.newIngestionJobType = config.get('jobDefinitions.jobs.new.type');
+    this.updateIngestionJobType = config.get('jobDefinitions.jobs.update.type');
+    this.swapUpdateIngestionJobType = config.get('jobDefinitions.jobs.swapUpdate.type');
   }
 
   public handler = async (): Promise<void> => {

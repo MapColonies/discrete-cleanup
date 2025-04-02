@@ -1,4 +1,5 @@
 {
+  "domain": "RASTER",
   "telemetry": {
     "logger": {
       "level": "info",
@@ -13,12 +14,6 @@
       "url": "http://telemetryUrl/metrics",
       "interval": "3"
     }
-  },
-  "job_manager": {
-    "url": "http://localhost:8080"
-  },
-  "mapproxy_api": {
-    "url": "http://localhost:8081"
   },
   "tiles_storage_provider": "S3",
   "fs": {
@@ -52,15 +47,30 @@
     "delay": "exponential",
     "shouldResetTimeout": true
   },
-  "jobTypes": {
-    "new_ingestion_job_type": "Ingestion_New",
-    "update_ingestion_job_type": "Ingestion_Update",
-    "swap_update_ingestion_job_type": "Ingestion_Swap_Update",
-    "export_job_type": "rasterTilesExporter"
+  "serviceUrls": {
+    "jobManager": "http://localhost:3000",
+    "mapproxyApi": "http://localhost:8080"
+  },
+  "jobDefinitions": {
+    "jobs": {
+      "new": {
+        "type": "Ingestion_New"
+      },
+      "update": {
+        "type": "Ingestion_Update"
+      },
+      "swapUpdate": {
+        "type": "Ingestion_Swap_Update"
+      },
+      "export": {
+        "type": "Export"
+      }
+    }
   },
   "cleanupTypes": {
     "failedIngestionTasks": true,
     "successfulIngestion": true,
     "successfulSwapUpdate": true
-  }
+  },
+  "disableHttpClientLogs": false
 }

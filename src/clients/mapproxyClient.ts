@@ -1,19 +1,30 @@
-import { inject, singleton } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
+import { Tracer } from '@opentelemetry/api';
 import { SERVICES } from '../common/constants';
-import { IConfig, IJob, IWithCleanDataIngestionParams } from '../common/interfaces';
+import { IConfig, JobResponse } from '../common/interfaces';
 
-@singleton()
-export class MapproxyClient extends HttpClient {
-  public constructor(@inject(SERVICES.CONFIG) private readonly config: IConfig, @inject(SERVICES.LOGGER) logger: Logger) {
-    super(logger, config.get<string>('mapproxy_api.url'), 'mapproxy-api', config.get<IHttpRetryConfig>('httpRetry'));
+@injectable()
+export class MapProxyClient extends HttpClient {
+  public constructor(
+    @inject(SERVICES.CONFIG) private readonly config: IConfig,
+    @inject(SERVICES.LOGGER) protected readonly logger: Logger,
+    @inject(SERVICES.TRACER) public readonly tracer: Tracer
+  ) {
+    super(
+      logger,
+      config.get<string>('serviceUrls.mapproxyApi'),
+      'mapproxyApi',
+      config.get<IHttpRetryConfig>('httpRetry'),
+      config.get<boolean>('disableHttpClientLogs')
+    );
   }
 
-  public async deleteLayers(discreteLayers: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
+  public async deleteLayers(discreteLayers: JobResponse[]): Promise<JobResponse[]> {
     const mapProxyLayersToDelete: string[] = [];
     for (const discrete of discreteLayers) {
-      const productType = discrete.parameters.metadata.productType as string;
+      const productType = discrete.productType as string;
       this.logger.info(`Deleting layer: [${discrete.resourceId}-${productType}]`);
       mapProxyLayersToDelete.push(`${discrete.resourceId}-${productType}`);
     }

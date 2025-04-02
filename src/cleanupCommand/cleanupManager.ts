@@ -1,9 +1,9 @@
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
-import { JobManagerClient } from '../clients/jobManagerClient';
-import { MapproxyClient } from '../clients/mapproxyClient';
+import { JobManagerWrapper } from '../clients/jobManagerClient';
+import { MapProxyClient } from '../clients/mapproxyClient';
 import { SERVICES } from '../common/constants';
-import { IConfig, IJob, IWithCleanDataIngestionParams, IDataLocation, ITilesLocation } from '../common/interfaces';
+import { IConfig, IDataLocation, ITilesLocation, JobResponse } from '../common/interfaces';
 import { IStorageProvider } from '../storageProviders/iStorageProvider';
 import { extractRootDirectory } from '../common/utils';
 
@@ -12,7 +12,6 @@ export class CleanupManager {
   private readonly discreteBatchSize: number;
   private readonly newIngestionJobType: string;
   private readonly updateIngestionJobType: string;
-  private readonly exporterJobType: string;
   private readonly sourceBlackList: string[];
   private readonly successCleanupDelayDays: number;
   private readonly failedCleanupDelayDays: number;
@@ -22,13 +21,13 @@ export class CleanupManager {
     @inject(SERVICES.SOURCES_PROVIDER) private readonly sourcesProvider: IStorageProvider,
     @inject(SERVICES.CONFIG) private readonly config: IConfig,
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
-    private readonly mapproxy: MapproxyClient,
-    private readonly jobManager: JobManagerClient
+    private readonly mapproxy: MapProxyClient,
+    private readonly jobManager: JobManagerWrapper
   ) {
     this.discreteBatchSize = config.get<number>('batch_size.discreteLayers');
-    this.newIngestionJobType = config.get('jobTypes.new_ingestion_job_type');
-    this.updateIngestionJobType = config.get('jobTypes.update_ingestion_job_type');
-    this.exporterJobType = config.get('jobTypes.export_job_type');
+    //TODO: fix the job types from config
+    this.newIngestionJobType = config.get('jobDefinitions.jobs.new.type');
+    this.updateIngestionJobType = config.get('jobDefinitions.jobs.update.type');
     this.sourceBlackList = config.get<string[]>('fs.blacklist_sources_location');
     this.successCleanupDelayDays = this.config.get<number>('success_cleanup_delay_days.ingestion');
     this.failedCleanupDelayDays = this.config.get<number>('failed_cleanup_delay_days.ingestion');
@@ -38,6 +37,7 @@ export class CleanupManager {
     this.logger.info({ msg: `Running Cleanup for failed expired ingestion jobs of type: ${this.newIngestionJobType}` });
     const notCleanedAndFailedNew = await this.jobManager.getFailedAndNotCleanedIngestionJobs(this.newIngestionJobType);
     for (let i = 0; i < notCleanedAndFailedNew.length; i += this.discreteBatchSize) {
+      //for each expired batch - delete sources and then tiles
       const currentBatch = notCleanedAndFailedNew.slice(i, i + this.discreteBatchSize);
       const expiredBatch = await this.deleteExpiredTasksSources(currentBatch, this.failedCleanupDelayDays);
       if (expiredBatch.length === 0) {
@@ -88,12 +88,12 @@ export class CleanupManager {
         batch: `${i + 1}/${Math.floor(notCleanedAndSuccess.length / this.discreteBatchSize + 1)}`,
         jobIds: blackListFilteredBatch.map((job) => job.id),
       });
-      const sourcesToDelete = currentBatch.filter((discrete) => !this.isIncludedInBlacklist(discrete.parameters.originDirectory));
-      const ignoredSources = currentBatch.filter((discrete) => this.isIncludedInBlacklist(discrete.parameters.originDirectory));
+      const sourcesToDelete = currentBatch.filter((discrete) => !this.isIncludedInBlacklist(discrete.parameters.inputFiles.originDirectory));
+      const ignoredSources = currentBatch.filter((discrete) => this.isIncludedInBlacklist(discrete.parameters.inputFiles.originDirectory));
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
-        sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
-        ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.originDirectory) : [],
+        sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.inputFiles.originDirectory) : [],
+        ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.inputFiles.originDirectory) : [],
       });
       const expiredBatch = this.filterExpiredFailedTasks(blackListFilteredBatch, this.successCleanupDelayDays);
       const sourcesDirectories = this.getSourcesLocation(expiredBatch);
@@ -127,12 +127,16 @@ export class CleanupManager {
       const blackListFilteredBatch =
         this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(notRunningExportFilteredBatch) : notRunningExportFilteredBatch;
       const sourcesDirectories = this.getSourcesLocation(blackListFilteredBatch);
-      const sourcesToDelete = notRunningExportFilteredBatch.filter((discrete) => !this.isIncludedInBlacklist(discrete.parameters.originDirectory));
-      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) => this.isIncludedInBlacklist(discrete.parameters.originDirectory));
+      const sourcesToDelete = notRunningExportFilteredBatch.filter(
+        (discrete) => !this.isIncludedInBlacklist(discrete.parameters.inputFiles.originDirectory)
+      );
+      const ignoredSources = notRunningExportFilteredBatch.filter((discrete) =>
+        this.isIncludedInBlacklist(discrete.parameters.inputFiles.originDirectory)
+      );
       this.logger.info({
         msg: `Will execute sources deletion after excluded from blacklist'`,
-        sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.originDirectory) : [],
-        ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.originDirectory) : [],
+        sourcesToDelete: sourcesToDelete.length ? sourcesToDelete.map((source) => source.parameters.inputFiles.originDirectory) : [],
+        ignoredSources: ignoredSources.length ? ignoredSources.map((source) => source.parameters.inputFiles.originDirectory) : [],
       });
       await this.sourcesProvider.deleteDiscretes(sourcesDirectories);
 
@@ -146,10 +150,10 @@ export class CleanupManager {
     }
   }
 
-  private filterExpiredFailedTasks(tasks: IJob<IWithCleanDataIngestionParams>[], delayDays: number): IJob<IWithCleanDataIngestionParams>[] {
+  private filterExpiredFailedTasks(tasks: JobResponse[], delayDays: number): JobResponse[] {
     const deleteDate = new Date();
     deleteDate.setDate(deleteDate.getDate() - delayDays);
-    const filteredTasks: IJob<IWithCleanDataIngestionParams>[] = [];
+    const filteredTasks: JobResponse[] = [];
     for (let i = 0; i < tasks.length; i++) {
       const updateDate = new Date(tasks[i].updated);
       if (updateDate <= deleteDate) {
@@ -159,10 +163,10 @@ export class CleanupManager {
     return filteredTasks;
   }
 
-  private filterBlackListSourcesTasks(tasks: IJob<IWithCleanDataIngestionParams>[]): IJob<IWithCleanDataIngestionParams>[] {
-    const filteredTasks: IJob<IWithCleanDataIngestionParams>[] = [];
+  private filterBlackListSourcesTasks(tasks: JobResponse[]): JobResponse[] {
+    const filteredTasks: JobResponse[] = [];
     for (let i = 0; i < tasks.length; i++) {
-      const originDirectory = tasks[i].parameters.originDirectory;
+      const originDirectory = tasks[i].parameters.inputFiles.originDirectory;
       if (!this.isIncludedInBlacklist(originDirectory)) {
         filteredTasks.push(tasks[i]);
       }
@@ -170,17 +174,17 @@ export class CleanupManager {
     return filteredTasks;
   }
 
-  private async filterFromRunningExportJobs(jobs: IJob<IWithCleanDataIngestionParams>[]): Promise<IJob<IWithCleanDataIngestionParams>[]> {
-    const runningExportJobs = await this.jobManager.getInProgressJobs(this.exporterJobType);
-    const cleanupReadyJobs: IJob<IWithCleanDataIngestionParams>[] = [];
+  private async filterFromRunningExportJobs(jobs: JobResponse[]): Promise<JobResponse[]> {
+    const runningExportJobs = await this.jobManager.getProcessingExportJobs();
+    const cleanupReadyJobs: JobResponse[] = [];
 
     for (const swapJob of jobs) {
-      const cleanupData = swapJob.parameters.cleanupData;
+      const cleanupData = swapJob.parameters.cleanupDataParams;
       const filteredJobs = runningExportJobs.filter(
         (job) =>
           cleanupData?.previousProductVersion === job.version &&
-          swapJob.parameters.metadata.productId === job.resourceId &&
-          swapJob.parameters.metadata.id === job.internalId
+          swapJob.parameters.cleanupDataParams?.previousRelativePath === job.parameters.cleanupDataParams?.directoryPath &&
+          swapJob.internalId === job.internalId
       );
       if (!filteredJobs.length) {
         cleanupReadyJobs.push(swapJob);
@@ -189,10 +193,7 @@ export class CleanupManager {
     return cleanupReadyJobs;
   }
 
-  private async deleteExpiredTasksSources(
-    tasks: IJob<IWithCleanDataIngestionParams>[],
-    delayDays: number
-  ): Promise<IJob<IWithCleanDataIngestionParams>[]> {
+  private async deleteExpiredTasksSources(tasks: JobResponse[], delayDays: number): Promise<JobResponse[]> {
     const expiredBatch = this.filterExpiredFailedTasks(tasks, delayDays);
     if (expiredBatch.length > 0) {
       const blackListFilteredBatch = this.sourceBlackList.length > 0 ? this.filterBlackListSourcesTasks(expiredBatch) : expiredBatch;
@@ -207,33 +208,36 @@ export class CleanupManager {
     return expiredBatch;
   }
 
-  private getSourcesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): IDataLocation[] {
+  private getSourcesLocation(discreteArray: JobResponse[]): IDataLocation[] {
     const sourcesDirectories: IDataLocation[] = discreteArray.map((discrete) => {
-      return { directory: discrete.parameters.originDirectory };
+      return { directory: discrete.parameters.inputFiles.originDirectory };
     });
     return sourcesDirectories;
   }
 
-  private getTilesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): ITilesLocation[] {
-    const tilesDirectories: ITilesLocation[] = discreteArray.map((discrete) => {
-      return {
-        directory: discrete.parameters.metadata.id as string,
-        subDirectory: discrete.parameters.metadata.displayPath as string,
-      };
-    });
-    return tilesDirectories;
+  private getTilesLocation(discreteArray: JobResponse[]): ITilesLocation[] {
+    return discreteArray
+      .map((discrete) => discrete.parameters.cleanupDataParams?.directoryPath) // Extract directoryPath
+      .filter((directoryPath): directoryPath is string => !!directoryPath && directoryPath.includes('/')) // Ensure it's non-empty and has a valid structure
+      .map((directoryPath) => {
+        const [catalogId, displayPath = ''] = directoryPath.split('/'); // Ensure displayPath is always a string
+        return {
+          directory: catalogId,
+          subDirectory: displayPath,
+        };
+      });
   }
-
-  private getSwappedTilesLocation(discreteArray: IJob<IWithCleanDataIngestionParams>[]): ITilesLocation[] {
+  private getSwappedTilesLocation(discreteArray: JobResponse[]): ITilesLocation[] {
     const tilesDirectories: ITilesLocation[] = discreteArray
-      .filter((nonFilteredDiscrete) => nonFilteredDiscrete.parameters.cleanupData)
+      .filter((nonFilteredDiscrete) => nonFilteredDiscrete.parameters.cleanupDataParams)
       .map((discrete) => {
-        if (discrete.parameters.cleanupData && !discrete.parameters.cleanupData.previousRelativePath) {
+        if (discrete.parameters.cleanupDataParams && !discrete.parameters.cleanupDataParams.previousRelativePath) {
           throw Error('Cleanup data must have previous relative path');
         }
+        const [catalogId, displayPath] = (discrete.parameters.cleanupDataParams?.directoryPath ?? '').split('/');
         return {
-          directory: discrete.parameters.metadata.id as string,
-          subDirectory: discrete.parameters.cleanupData?.previousRelativePath as string,
+          directory: catalogId,
+          subDirectory: displayPath,
         };
       });
 

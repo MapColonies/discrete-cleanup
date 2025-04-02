@@ -1,9 +1,9 @@
-import { MapproxyClient } from '../../../src/clients/mapproxyClient';
+import { MapProxyClient } from '../../../src/clients/mapproxyClient';
 
 const deleteLayersMock = jest.fn();
 
 const mapproxyClientMock = {
   deleteLayers: deleteLayersMock,
-} as unknown as MapproxyClient;
+} as unknown as MapProxyClient;
 
 export { mapproxyClientMock, deleteLayersMock };

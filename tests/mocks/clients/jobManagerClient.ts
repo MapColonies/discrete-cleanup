@@ -1,4 +1,4 @@
-import { JobManagerClient } from '../../../src/clients/jobManagerClient';
+import { JobManagerWrapper } from '../../../src/clients/jobManagerClient';
 
 const getSuccessNotCleanedJobsMock = jest.fn();
 const getFailedAndNotCleanedIngestionJobsMock = jest.fn();
@@ -12,7 +12,7 @@ const jobManagerClientMock = {
   getInProgressJobs: getInProgressJobsMock,
   markAsCompleted: markAsCompletedMock,
   markAsCompletedAndRemoveFiles: markAsCompletedAndRemoveFilesMock,
-} as unknown as JobManagerClient;
+} as unknown as JobManagerWrapper;
 
 export {
   jobManagerClientMock,

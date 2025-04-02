@@ -1,4 +1,5 @@
 {
+  "domain": "JOB_DOMAIN",
   "telemetry": {
     "serviceName": "TELEMETRY_SERVICE_NAME",
     "hostname": "TELEMETRY_HOST_NAME",
@@ -19,12 +20,6 @@
       "url": "TELEMETRY_METRICS_URL",
       "interval": "TELEMETRY_METRICS_INTERVAL"
     }
-  },
-  "job_manager": {
-    "url": "JOB_MANAGER_URL"
-  },
-  "mapproxy_api": {
-    "url": "MAPPROXY_API_URL"
   },
   "tiles_storage_provider": "TILES_STORAGE_PROVIDER",
   "fs": {
@@ -80,6 +75,10 @@
     "__name": "DISABLE_SOURCES_CLEANUP",
     "__format": "boolean"
   },
+  "serviceUrls": {
+    "jobManager": "JOB_MANAGER_URL",
+    "mapproxyApi": "MAPPROXY_API_URL"
+  },
   "httpRetry": {
     "attempts": {
       "__name": "HTTP_RETRY_ATTEMPTS",
@@ -87,15 +86,29 @@
     },
     "delay": "HTTP_RETRY_DELAY",
     "shouldResetTimeout": {
-      "__name": "HTTP_RETRY_RESET_TIMEOUT",
+      "__name": "HTTP_RETRY_SHOULD_RESET_TIMEOUT",
       "__format": "boolean"
     }
   },
-  "jobTypes": {
-    "new_ingestion_job_type": "NEW_INGESTION_JOB_TYPE",
-    "update_ingestion_job_type": "UPDATE_INGESTION_JOB_TYPE",
-    "swap_update_ingestion_job_type": "SWAP_UPDATE_INGESTION_JOB_TYPE",
-    "export_job_type": "EXPORT_JOB_TYPE"
+  "disableHttpClientLogs": {
+    "__name": "DISABLE_HTTP_CLIENT_LOGS",
+    "__format": "boolean"
+  },
+  "jobDefinitions": {
+    "jobs": {
+      "new": {
+        "type": "INGESTION_NEW_JOB_TYPE"
+      },
+      "update": {
+        "type": "INGESTION_UPDATE_JOB_TYPE"
+      },
+      "swapUpdate": {
+        "type": "INGESTION_SWAP_UPDATE_JOB_TYPE"
+      },
+      "export": {
+        "type": "EXPORT_JOB_TYPE"
+      }
+    }
   },
   "cleanupTypes": {
     "failedIngestionTasks": {
